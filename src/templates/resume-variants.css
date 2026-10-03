@@ -1,0 +1,287 @@
+/* 文件职责：八种版式的展示差异；保持共用画布与数据，不定义存储或导出流程。 */
+/* 新版式沿用同一画布和字号变量，屏幕与打印只切换排版。 */
+.resume-page.light-header .resume-masthead {
+  min-height: 210px;
+  padding: 32px 52px 25px;
+  background: #fff;
+  color: var(--ink);
+}
+.resume-page.light-header :is(.resume-name, .profile-line, .masthead-contact) {
+  color: var(--ink);
+}
+.resume-page.light-header :is(.github-handle, .resume-role, .masthead-add) {
+  color: var(--accent);
+  opacity: 1;
+}
+.resume-page.light-header .link-address-input {
+  border-color: var(--accent-line);
+  background: var(--accent-soft);
+}
+.resume-page.light-header .link-address-input::placeholder {
+  color: #8793a2;
+}
+.resume-page.light-header .masthead-top {
+  border-color: #e5e9ef;
+}
+.resume-page.light-header.has-photo .masthead-top,
+.resume-page.light-header.has-photo .masthead-bottom {
+  margin-left: 0;
+  margin-right: 142px;
+}
+.resume-page.light-header .masthead-photo {
+  top: 32px;
+  right: 42px;
+  left: auto;
+  width: 112px;
+  height: 136px;
+  border: 1px solid #e5e9ef;
+}
+.resume-page.light-header .resume-main {
+  border: 0;
+}
+
+/* 极简：居中的身份信息与横排联系方式，正文为完整单栏。 */
+.resume-page.layout-minimal .resume-masthead {
+  border-bottom: 1px solid var(--accent-line);
+}
+.resume-page.layout-minimal .masthead-top {
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  border: 0;
+  text-align: center;
+}
+.resume-page.layout-minimal .masthead-identity {
+  justify-content: center;
+}
+.resume-page.layout-minimal .resume-role {
+  margin-top: 0;
+  color: var(--accent);
+}
+.resume-page.layout-minimal .github-handle {
+  border-left: 1px solid var(--accent-line);
+}
+.resume-page.layout-minimal .masthead-bottom {
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  padding-top: 8px;
+}
+.resume-page.layout-minimal .profile-lines,
+.resume-page.layout-minimal .masthead-contacts {
+  flex-direction: row;
+  align-items: baseline;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 6px 22px;
+  margin: 0;
+}
+.resume-page.layout-minimal .profile-line,
+.resume-page.layout-minimal .masthead-contact {
+  line-height: 1.7;
+}
+.resume-page.layout-minimal .resume-main {
+  padding: 28px 52px 40px;
+}
+.resume-page.layout-minimal .section-heading {
+  padding: 0 0 4px;
+  border: 0;
+  border-bottom: 1px solid var(--accent);
+  background: transparent;
+}
+.resume-page.layout-minimal .section-title {
+  color: #222;
+}
+
+/* 商务：左对齐的姓名和主页、页眉底线与单栏栏目细线。 */
+.resume-page.layout-executive .resume-masthead {
+  border-bottom: 4px solid var(--accent);
+}
+.resume-page.layout-executive .masthead-top {
+  border: 0;
+}
+.resume-page.layout-executive .masthead-identity {
+  flex-direction: column;
+  align-items: flex-start;
+}
+.resume-page.layout-executive .github-handle {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  min-height: 28px;
+}
+.resume-page.layout-executive .resume-role {
+  margin-top: 12px;
+}
+.resume-page.layout-executive .masthead-bottom {
+  padding-top: 5px;
+}
+.resume-page.layout-executive .resume-main {
+  padding: 28px 52px 40px;
+}
+.resume-page.layout-executive .section-heading {
+  padding: 0 0 5px;
+  border: 0;
+  border-bottom: 1px solid var(--accent-line);
+  background: transparent;
+}
+.resume-page.layout-executive .section-title {
+  color: var(--accent);
+}
+
+/* 编辑式：不同宽度的左右栏，栏目仍在各自容器内连续排列。 */
+.resume-page.layout-editorial .resume-masthead {
+  min-height: 215px;
+  padding: 28px 40px 24px;
+  border-top: 8px solid var(--accent);
+  border-bottom: 1px solid #e5e9ef;
+}
+.resume-page.layout-editorial .masthead-top {
+  border: 0;
+}
+.resume-page.layout-editorial .resume-main {
+  padding: 28px 40px 40px;
+  column-gap: 32px;
+}
+.resume-page.layout-editorial .resume-column-left {
+  flex: 0 0 42%;
+}
+.resume-page.layout-editorial .resume-column-right {
+  flex: 1 1 0;
+}
+.resume-page.layout-editorial .section-heading {
+  padding: 0 0 4px;
+  border: 0;
+  border-bottom: 2px solid var(--accent);
+  background: transparent;
+}
+.resume-page.layout-editorial .section-title {
+  color: var(--accent);
+}
+
+/* 时间线只增加视觉轨道，不自动排序或添加正文列表符号。 */
+.resume-page.layout-timeline .resume-masthead {
+  border-bottom: 1px solid var(--accent-line);
+}
+.resume-page.layout-timeline .masthead-top {
+  border: 0;
+}
+.resume-page.layout-timeline .resume-role {
+  margin-top: 14px;
+}
+.resume-page.layout-timeline .resume-main {
+  padding: 24px 52px 32px;
+}
+.resume-page.layout-timeline .section-heading {
+  padding: 4px 12px;
+  border: 0;
+  background: var(--accent-soft);
+}
+.resume-page.layout-timeline .section-title {
+  color: var(--accent);
+}
+.resume-page.layout-timeline .entry-list {
+  display: block;
+  margin: 8px 0 0 9px;
+  padding-left: 22px;
+  border-left: 2px solid var(--accent-line);
+}
+.resume-page.layout-timeline .resume-entry {
+  margin-bottom: 4px;
+}
+.resume-page.layout-timeline .resume-entry::before {
+  content: '';
+  position: absolute;
+  top: 10px;
+  left: -29px;
+  width: 10px;
+  height: 10px;
+  border: 3px solid var(--accent);
+  border-radius: 50%;
+  background: #fff;
+}
+
+.resume-page.layout-sidebar-right {
+  grid-template-columns: minmax(0, 1fr) var(--sidebar-width);
+}
+.resume-page.layout-sidebar-right .resume-masthead {
+  grid-column: 2;
+}
+.resume-page.layout-sidebar-right .resume-main {
+  grid-column: 1;
+}
+
+/* 画廊用版式分类和缩略图辅助选择，不把颜色变化当作新模板。 */
+.template-count {
+  color: #7c8b9b;
+  font-size: 11px;
+  white-space: nowrap;
+}
+.template-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 14px;
+}
+.template-filters button {
+  border: 1px solid #e4e9ef;
+  border-radius: 6px;
+  padding: 6px 12px;
+  background: #fff;
+  color: #748294;
+  font-size: 11px;
+  cursor: pointer;
+}
+.template-filters button[aria-pressed='true'] {
+  border-color: #b9cedf;
+  background: #edf4fa;
+  color: #385a7b;
+}
+.template-options {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+.template-option {
+  position: relative;
+  grid-template-columns: 54px minmax(0, 1fr);
+  padding: 12px 10px;
+}
+.template-option-copy {
+  min-width: 0;
+  gap: 5px;
+}
+.template-option-copy strong {
+  padding-right: 8px;
+  font-size: 12px;
+}
+.template-option-copy small {
+  line-height: 1.65;
+}
+.template-layout-label {
+  color: #95a1af;
+  font-size: 9px;
+}
+.template-selected {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+}
+.resume-card-preview .template-thumbnail {
+  box-shadow: 0 5px 15px rgb(27 41 60 / 18%);
+}
+@media screen and (max-width: 650px) {
+  .template-options {
+    grid-template-columns: 1fr;
+  }
+  .resume-page.light-header.has-photo .masthead-top,
+  .resume-page.light-header.has-photo .masthead-bottom {
+    margin-right: 0;
+  }
+  .resume-page.light-header .masthead-photo {
+    position: relative;
+    top: auto;
+    right: auto;
+    left: auto;
+    align-self: center;
+  }
+}

@@ -1,0 +1,15 @@
+node_modules/
+dist/
+.DS_Store
+*.local
+.env
+.env.*
+!.env.example
+*.log
+*.pdf
+*备份*.json
+resume-studio-backup*.json
+/backups/
+/exports/
+/local-data/
+/work/

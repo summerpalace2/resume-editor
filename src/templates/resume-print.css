@@ -1,0 +1,131 @@
+/* 文件职责：全部版式的 A4 打印覆盖，必须在基础样式及变体样式之后加载。 */
+@page {
+  size: A4;
+  margin: 0;
+}
+
+/* 所有模板共用打印入口，版式的宽度、内边距和字体继续沿用预览定义。 */
+@media print {
+  :root,
+  body {
+    width: 210mm;
+    margin: 0;
+    background: #fff;
+  }
+  body {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  .no-print,
+  .app-toolbar,
+  .workspace-hint {
+    display: none !important;
+  }
+  .workspace-shell,
+  .resume-stage {
+    display: block;
+    min-height: 0;
+    padding: 0;
+    background: #fff;
+  }
+  .resume-page {
+    /* 固定画布映射到 A4，避免浏览器随内容或窗口宽度缩小整份简历。 */
+    width: 1024px;
+    height: auto;
+    min-height: 0;
+    /* 约为 A4 宽度 793.7 CSS px / 1024；PDF 正文 pt ≈ 逻辑字号 px × 0.775 × 72/96。 */
+    zoom: 0.775;
+    margin: 0;
+    overflow: visible;
+    box-shadow: none;
+    border-radius: 0;
+  }
+  .resume-masthead {
+    border-radius: 0;
+    break-inside: avoid;
+  }
+  .resume-page .resume-main {
+    min-height: 0;
+    overflow: visible;
+    padding-bottom: 30px;
+    /* 跨页后复制正文内边距，让续页也保留上下留白，不改变左右栏的宽度。 */
+    -webkit-box-decoration-break: clone;
+    box-decoration-break: clone;
+  }
+  .resume-page.structure-columns .resume-main {
+    display: flex;
+    column-count: auto;
+  }
+  .resume-page.structure-single .resume-main,
+  .resume-page.structure-sidebar .resume-main {
+    /* 单列分栏上下文可能使整块正文跳页；这里使用普通文档流。 */
+    column-count: auto;
+  }
+  .resume-page.structure-sidebar {
+    /* 侧栏改用独立背景，正文自然分页，避免高网格行被打印引擎整体缩放。 */
+    position: relative;
+    display: block;
+    /* 侧栏个人信息脱离正文流，至少保留一页高度，背景则由固定伪元素逐页绘制。 */
+    min-height: 1448px;
+    padding-left: var(--sidebar-width);
+    background: #fff;
+  }
+  .resume-page.structure-sidebar::before {
+    /* 固定纯色色块在每页重复，末页也铺满；正文透明，边缘不会产生台阶。 */
+    content: '';
+    position: fixed;
+    inset: 0 auto 0 0;
+    width: var(--sidebar-width);
+    background: var(--header-bg);
+    pointer-events: none;
+  }
+  .resume-page.structure-sidebar .resume-masthead {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: var(--sidebar-width);
+    min-height: 0;
+    z-index: 1;
+    background: transparent;
+    overflow: visible;
+  }
+  .resume-page.structure-sidebar .resume-main {
+    position: relative;
+    min-height: 0;
+    background: transparent;
+  }
+  .resume-page.layout-sidebar-right {
+    padding-left: 0;
+    padding-right: var(--sidebar-width);
+  }
+  .resume-page.layout-sidebar-right::before {
+    right: 0;
+    left: auto;
+  }
+  .resume-page.layout-sidebar-right .resume-masthead {
+    right: 0;
+    left: auto;
+  }
+  .resume-section,
+  .resume-entry {
+    break-inside: auto;
+    overflow: visible;
+  }
+  .entry-list {
+    /* 普通块让标题和说明之间的分页约束生效，长条目仍可继续到下一页。 */
+    display: block;
+  }
+  .section-heading,
+  .entry-topline,
+  .entry-subtitle {
+    break-inside: avoid;
+    break-after: avoid;
+  }
+  .entry-description {
+    orphans: 3;
+    widows: 3;
+  }
+  .inline-editable {
+    outline: 0 !important;
+  }
+}
