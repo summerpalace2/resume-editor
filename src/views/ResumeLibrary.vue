@@ -93,7 +93,9 @@ async function importBackup(event: Event): Promise<void> {
       </div>
 
       <div class="backup-bar">
-        <div><strong>本地数据</strong><span>自动保存在此浏览器</span></div>
+        <div>
+          <strong>浏览器本地数据</strong><span>自动保存到当前浏览器，不会上传服务器</span>
+        </div>
         <div class="backup-actions">
           <button class="button button-quiet" @click="exportBackup">备份全部简历</button>
           <button class="button button-quiet" @click="importInput?.click()">
@@ -150,7 +152,9 @@ async function importBackup(event: Event): Promise<void> {
         </article>
       </div>
 
-      <p class="library-footnote">简历数据只保存在当前浏览器。记得定期下载备份文件。</p>
+      <p class="library-footnote">
+        简历保存在当前浏览器的本地数据库，不在项目文件夹内。换浏览器、电脑或访问地址时，请先下载备份，再在新环境导入。
+      </p>
     </section>
   </main>
 </template>

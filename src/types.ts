@@ -7,6 +7,18 @@ export type SectionKind =
   'education' | 'work' | 'projects' | 'skills' | 'awards' | 'custom'
 export type SectionColumn = 'left' | 'right'
 
+/** UTF-16 半开区间，与浏览器输入框 selectionStart/selectionEnd 使用相同索引。 */
+export interface TextFormatRange {
+  start: number
+  end: number
+  bold?: true
+  /** 只允许六位十六进制颜色；不存 HTML、CSS 声明或浏览器 DOM。 */
+  color?: string
+}
+export type ProfileTextField =
+  'name' | 'role' | 'github' | 'email' | 'phone' | 'location' | 'summary'
+export type EntryTextField = 'title' | 'subtitle' | 'period' | 'description' | 'link'
+
 /** 一条经历或一组技能；稳定 ID 用于编辑定位，与当前排序位置无关。 */
 export interface ResumeEntry {
   id: string
@@ -18,6 +30,7 @@ export interface ResumeEntry {
   description: string
   /** 可选跳转地址；渲染时规范化为 HTTP(S) 链接，兼容旧备份缺少此字段。 */
   link?: string
+  textFormats?: Partial<Record<EntryTextField, TextFormatRange[]>>
 }
 
 /** 栏目及其条目集合；隐藏只影响展示，不删除内容。 */
@@ -29,6 +42,7 @@ export interface ResumeSection {
   /** 双栏中的显式归属；缺省时由模板推导，单栏切换仍保留此信息。 */
   column?: SectionColumn
   entries: ResumeEntry[]
+  titleFormats?: TextFormatRange[]
 }
 
 /** 个人信息；与模板无关，切换版式时复用同一份数据。 */
@@ -47,6 +61,8 @@ export interface ResumeProfile {
   summary: string
   /** 本地图片数据地址；null 表示无照片，备份包含图片内容。 */
   photo: string | null
+  textFormats?: Partial<Record<ProfileTextField, TextFormatRange[]>>
+  profileLineFormats?: TextFormatRange[][]
 }
 
 export type FontChoice = 'modern' | 'classic' | 'round'
@@ -68,6 +84,14 @@ export type AccentChoice =
   | 'slate'
   | 'lavender'
   | 'ice'
+  | 'sky'
+  | 'mist'
+  | 'mint'
+  | 'aqua'
+  | 'rose'
+  | 'peach'
+  | 'lilac'
+  | 'pearl'
 /** 可持久化的版式 ID；结构及默认分组在 data/templates.ts 中维护。 */
 export type ResumeTemplateId =
   | 'two-column'
@@ -88,6 +112,8 @@ export interface ResumeAppearance {
   headingScale: number
   /** 正文、条目标题和时间字号；设置界面提供 14～24px。 */
   bodyScale: number
+  /** 正文相邻段落的额外间距，逻辑画布 px；缺省为 6，允许 0～24。 */
+  paragraphSpacing?: number
   /** 单项头部字号覆盖；缺项使用对应版式默认值，兼容旧文档。 */
   headerFontSizes?: Partial<Record<HeaderFontTarget, number>>
   /** 个人信息逐行字号；索引与 profile.profileLines 对齐。 */

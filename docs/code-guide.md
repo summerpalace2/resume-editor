@@ -24,11 +24,13 @@
 | `src/domain/validation.ts`                   | 重建完整已校验文档；外部 JSON 和数据库记录共用；剔除未知字段          |
 | `src/domain/factories.ts`                    | 空条目/栏目工厂及稳定 ID，不依赖 Vue 或页面                           |
 | `src/domain/operations.ts`                   | 草稿的字段变换、栏内排序、跨栏移动；不操作父状态或存储                |
+| `src/domain/textFormatting.ts`               | 局部样式区间拆段、选区设置与文字变更后的格式映射                      |
+| `src/domain/textLists.ts`                    | 选中段落添加/取消圆点；按精确位置映射文字格式，保留空行               |
 | `src/domain/links.ts`                        | HTTP(S) 地址规范化、GitHub 显示标签和编辑值                           |
 | `src/data/defaultResume.ts`                  | 空简历、首次示例及整份文档复制；不访问存储                            |
 | `src/data/clone.ts`                          | toRaw + structuredClone；只解除根代理，输入须可序列化                 |
 | `src/data/templates.ts`                      | 八种版式与结构分类，缺省栏目归属                                      |
-| `src/data/palettes.ts`                       | 十六套语义颜色与唯一主题校验                                          |
+| `src/data/palettes.ts`                       | 二十四套语义颜色与唯一主题校验，包含八套清新浅色                      |
 | `src/data/typography.ts`                     | 基础/头部字号范围、缺省值与可选覆盖解析                               |
 | `src/stores/resumes.ts`                      | 文档集合、活动 ID、统一修改动作、读取与保存状态                       |
 | `src/storage/database.ts`                    | IndexedDB 原子读取/写入，事务内比较 workspaceRevision                 |
@@ -36,9 +38,15 @@
 | `src/storage/backup.ts`                      | v1 协议、JSON 文件读取/下载，文档校验交给 domain                      |
 | `src/services/photos.ts`                     | 浏览器图片解码、640px 缩放与 JPEG 编码，释放临时 URL                  |
 | `src/services/editLifecycle.ts`              | 离开前提交活动编辑框的事件协议                                        |
+| `src/services/richTextDocument.ts`           | 编辑内核 JSON 与纯文本/格式区间双向转换；映射选区位置                 |
 | `src/composables/useResumeEditing.ts`        | 克隆草稿、调用文档操作、发事件；确认框、拖拽事件、照片任务生命周期    |
 | `src/composables/useResumeStyle.ts`          | 文档到 CSS 变量；字体就绪后重新测量侧栏                               |
-| `src/components/InlineEdit.vue`              | 局部草稿、提交/取消，响应页面提交协议                                 |
+| `src/composables/usePreviewZoom.ts`          | 页面临时缩放比例与可用宽度测量，不写入文档或存储                      |
+| `src/components/PreviewZoomControls.vue`     | 工作区和设置页共用的缩放按钮、滑杆及比例显示，只发事件                |
+| `src/components/ResumePreviewViewport.vue`   | 设置页小预览与大预览共用查看器，整页适配、拖动及选字切换              |
+| `src/components/InlineEdit.vue`              | 文字/格式草稿、选区工具栏、提交/取消，响应页面提交协议                |
+| `src/components/RichTextField.vue`           | 按需加载的原位富文本编辑，输入、IME、撤销、纯文本粘贴及即时样式       |
+| `src/components/FormattedText.vue`           | 将纯文本和样式区间渲染为安全 span，供预览与打印共用                   |
 | `src/components/ResumePreview.vue`           | 公共预览入口，转发 props/emit                                         |
 | `src/components/TemplateThumbnail.vue`       | 共用配色的结构示意缩略图，非正文截图                                  |
 | `src/templates/ResumeCanvas.vue`             | 画布容器、列分组与添加栏目；不访问 store/数据库                       |
@@ -62,6 +70,28 @@
 
 ## 3. 关键数据参数
 
+局部格式新增于 `TextFormatRange`：`start/end` 是与浏览器输入框一致的 UTF-16 半开区间，`bold` 与 `color` 描述手动强调。个人信息/经历的 `textFormats`、个人信息行的 `profileLineFormats`、栏目 `titleFormats` 均为可选字段，旧数据无需数据库升级。
+
+`domain/textFormatting.ts` 处理拆段、选区样式和输入后的区间映射；`components/FormattedText.vue` 用安全 span 渲染。`InlineEdit` 的 `commit(value, formats)` 一次提交文本和样式，避免分别提交导致父文档副本互相覆盖。完成字段编辑后，观察与打印使用同一份纯文本及格式，不存 HTML；编辑控件标记为 no-print。
+
+格式工具栏仅在活动字段有选区时显示，通过 Teleport 挂到 body，以 fixed 定位避开简历画布的缩放和裁剪。展示文字拖选后转入编辑内核时映射并保留选区；焦点从编辑区域移到悬浮工具栏仍属同一次编辑，活动字段结束时销毁内核并释放监听。
+
+`RichTextField` 用 Tiptap/ProseMirror 管理 contenteditable、选区、IME 组合输入和撤销历史，加粗/颜色直接通过编辑事务渲染。持久化的唯一契约仍是 `ResumeDocument`，临时编辑 JSON 不写入 IndexedDB。`richTextDocument` 映射段落开闭位置与 UTF-16 文本偏移，兼容原有纯文本及格式；输入时不由 Vue 重建编辑 DOM，以保留光标。粘贴只接受 text/plain，长度为零时不替换选区，空格和换行则保留。
+
+`InlineEdit` 在展示与编辑间保留同一个字段根节点；异步编辑器挂载期间，原文字仍承担布局，收到 `ready` 后才交换内容。`services/editorViewport.ts` 在点击时记录页面及祖先滚动位置，初次恢复选区沿用这一快照，格式按钮则使用当前快照，避免编辑器异步聚焦和选区自动滚动导致闪动。
+
+`composables/usePreviewZoom.ts` 管理工作区 25%～200%、设置页 10%～200% 的临时查看比例；适应宽度模式通过 ResizeObserver 测量可用宽度，手动比例不随窗口或样式变化重置。`PreviewZoomControls` 只发出比例与适应宽度事件，各页面管理自己的查看状态。设置页允许更低的比例，以适应较窄的右侧预览区域。
+
+两处均以屏幕专用 `zoom` 缩放外层包装及 1024px 画布的布局占位，设置页移除原有固定缩略比例，避免叠加缩放；预览区域放大后可滚动，编辑浮层仍使用实际视口坐标。比例不写入简历、IndexedDB 或备份；打印包装层恢复 1，画布保持既有 0.775 的 A4 映射。
+
+设置页用原生 `dialog.showModal()` 展开大预览，浏览器负责焦点约束和 Escape，关闭时卸载大预览，小预览始终保留。`ResumePreviewViewport` 复用同一查看器，不访问 store；`fitPage` 根据实际逻辑画布高度计算比例，长文档也按完整高度适配。拖动使用 Pointer Capture，指针移出画布仍可平移，松开、取消或丢失捕获即清理；链接和滚动条保留浏览器行为。拖动只改变滚动位置，关闭拖动模式后可选中文字。
+
+经历正文的 InlineEdit 开启 `listEnabled`，使用 `textLists.ts` 切换所选段落的纯文本圆点。多段插入从后往前处理并按明确位置移动格式区间，避免共同前后缀映射将中间正文的加粗和颜色误判为被替换内容。选区结束在下一段开头时不处理下一段，空白段落不生成列表项；这项操作不新增备份字段。
+
+`data/textColors.ts` 集中维护 55 种局部文字预设色及分组名称，包含 25 种浅蓝青、浅绿、浅暖色、浅粉紫和柔和浅灰。`InlineEdit` 的颜色面板按登记表渲染，预设与自选色共用格式动作；浅色只改变选中文字，不改变主题。面板支持色号输入，三位简写在应用前展开为六位；无效输入只提示，不修改文字。`resetColor` 只移除颜色标记，`clear` 则同时移除加粗和颜色，仍复用同一格式提交与打印路径。
+
+`appearance.paragraphSpacing` 是可选的逻辑画布段间距，范围 0～24px，缺省 6px，范围与默认值共用 `paragraphSpacingOption`。`textParagraphs` 按显式换行拆出段落并保留跨段的颜色/加粗；自动折行不拆段。观察模式原始换行放在不占布局的文本 span 中，保持 DOM 范围偏移；编辑模式用内核的 paragraph 节点自然展开，段间距共用同一 CSS 变量，无独立效果预览。
+
 | 参数                                       | 含义与边界                                                             |
 | ------------------------------------------ | ---------------------------------------------------------------------- |
 | 文档/栏目/条目的 `id`                      | 稳定定位标识，分别在工作区/文档/栏目作用域唯一；索引用于排序，不可互换 |
@@ -70,12 +100,13 @@
 | `sections` / `entries`                     | 原始顺序；隐藏仍保留数据与索引                                         |
 | `kind` / `column` / `visible`              | 栏目类别、可选左右归属、展示开关；单栏保留左右归属                     |
 | `description` / `period`                   | 正文纯文本和换行，符号由用户输入；时间直接展示，不解析                 |
-| `link` / `github`                          | 保存输入文本，跳转时规范化 HTTP(S)；项目链接编辑器位于项目栏目         |
+| `link` / `github`                          | 保存输入文本，跳转时规范化 HTTP(S)；所有经历可按需展开链接编辑器       |
 | `profileLines` / `profileLineScales`       | 按索引配对，缺字号使用 18px，范围 12～28px                             |
 | `photo`                                    | 本地光栅图片 data URL 或 null；写入和备份均包含照片                    |
 | `summary`                                  | 旧数据保留字段，画布未单独展示                                         |
 | `nameScale` / `headingScale` / `bodyScale` | 逻辑画布 px 字号，Scale 不是倍率；范围 40～60 / 20～32 / 14～24        |
 | `headerFontSizes`                          | 可选单项字号，缺项按版式回退，不强行把默认值写入旧备份                 |
+| `paragraphSpacing`                         | 可选正文段间距，0～24px，缺省 6px；不改变自动折行的行距                |
 | `updatedAt`                                | Unix 毫秒时间戳；统一修改动作刷新，管理页日期与排序使用它              |
 | `ready` / `canPersist`                     | 完成读取尝试 / 获得写回权限；读取失败时前者 true、后者 false           |
 | `conflict`                                 | 本地修订已由另一页面推进；禁止写回，保留内存供备份                     |
@@ -116,7 +147,7 @@
 | 侧栏补偿 44 / 50 / 51px               | 内边距 / 内边距加 GitHub 间距 / 内边距加联系方式间距，另计图标字号 |
 | 照片 640px / JPEG 0.86                | 最长边与编码质量，不是显示尺寸或透明度                             |
 | 1024 × 1448px                         | A4 比例基线；内容超过最低高度可自然分页                            |
-| 预览 0.29296875                       | 300 / 1024，整体缩小，保留真实换行                                 |
+| 预览缩放 10/25～200%                  | 设置页/工作区最低比例不同，默认按可用宽度计算，保留真实换行        |
 | 打印 0.775                            | 约为 A4 CSS 宽度 / 1024；pt ≈ 逻辑 px × 0.775 × 72/96              |
 | orphans/widows 3                      | 控制段落分页最少行数，不保证任意内容一页展示                       |
 

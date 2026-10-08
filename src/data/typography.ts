@@ -9,6 +9,16 @@ export const baseFontOptions = [
   { key: 'bodyScale', label: '正文', min: 14, max: 24 },
 ] as const
 
+/** 正文段落间距的唯一范围/默认值；不影响自动折行的行距。 */
+export const paragraphSpacingOption = { min: 0, max: 24, default: 6 } as const
+
+export function paragraphSpacing(appearance: ResumeAppearance): number {
+  const value = appearance.paragraphSpacing
+  return typeof value === 'number' && Number.isFinite(value)
+    ? Math.min(paragraphSpacingOption.max, Math.max(paragraphSpacingOption.min, value))
+    : paragraphSpacingOption.default
+}
+
 /** 逻辑画布 px 范围，设置滑杆和导入校验共用；不对应 PDF 的直接 pt 值。 */
 export const headerFontOptions: {
   key: HeaderFontTarget

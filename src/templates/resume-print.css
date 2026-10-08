@@ -28,6 +28,12 @@
     padding: 0;
     background: #fff;
   }
+  .preview-zoom-frame {
+    /* 屏幕查看比例不参与 PDF，仍由画布的 A4 映射规则控制打印比例。 */
+    width: auto;
+    margin: 0;
+    zoom: 1;
+  }
   .resume-page {
     /* 固定画布映射到 A4，避免浏览器随内容或窗口宽度缩小整份简历。 */
     width: 1024px;

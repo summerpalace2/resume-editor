@@ -4,7 +4,12 @@ import { cloneData } from '../data/clone'
 import * as operations from '../domain/operations'
 import { compressPhoto } from '../services/photos'
 import { isColumnTemplate, resolveSectionColumn } from '../data/templates'
-import type { ResumeDocument, ResumeSection, SectionColumn } from '../types'
+import type {
+  ResumeDocument,
+  ResumeSection,
+  SectionColumn,
+  TextFormatRange,
+} from '../types'
 
 export function useResumeEditing(
   current: () => ResumeDocument,
@@ -24,10 +29,13 @@ export function useResumeEditing(
     if (operation(draft)) submit(draft)
   }
 
-  const updateProfile = (key: operations.ProfileTextKey, value: string) =>
-    apply((draft) => operations.updateProfile(draft, key, value))
-  const updateProfileLine = (index: number, value: string) =>
-    apply((draft) => operations.updateProfileLine(draft, index, value))
+  const updateProfile = (
+    key: operations.ProfileTextKey,
+    value: string,
+    formats?: TextFormatRange[],
+  ) => apply((draft) => operations.updateProfile(draft, key, value, formats))
+  const updateProfileLine = (index: number, value: string, formats?: TextFormatRange[]) =>
+    apply((draft) => operations.updateProfileLine(draft, index, value, formats))
   const updateSection = (id: string, patch: operations.SectionPatch) =>
     apply((draft) => operations.updateSection(draft, id, patch))
   const updateEntry = (
@@ -35,7 +43,11 @@ export function useResumeEditing(
     entryId: string,
     key: operations.EntryTextKey,
     value: string,
-  ) => apply((draft) => operations.updateEntry(draft, sectionId, entryId, key, value))
+    formats?: TextFormatRange[],
+  ) =>
+    apply((draft) =>
+      operations.updateEntry(draft, sectionId, entryId, key, value, formats),
+    )
   const moveSection = (index: number, offset: number) =>
     apply((draft) => operations.moveSection(draft, index, offset))
   const moveSectionToColumn = (id: string, column: SectionColumn) =>

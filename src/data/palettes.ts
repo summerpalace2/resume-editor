@@ -1,7 +1,7 @@
-/** @file 16 套主题的语义颜色登记表，选择卡片、缩略图、画布及 PDF 共用。 */
+/** @file 主题的语义颜色登记表，选择卡片、缩略图、画布及 PDF 共用。 */
 import type { AccentChoice } from '../types'
 
-export type PaletteGroup = 'classic' | 'natural' | 'warm' | 'cool'
+export type PaletteGroup = 'classic' | 'natural' | 'warm' | 'cool' | 'pastel'
 
 /** 保持页眉底色与强调色独立，浅色主题可以使用深色文字。 */
 export interface ResumePalette {
@@ -26,6 +26,7 @@ export const paletteGroups: { id: PaletteGroup; name: string }[] = [
   { id: 'natural', name: '自然绿系' },
   { id: 'warm', name: '温暖色调' },
   { id: 'cool', name: '柔和冷色' },
+  { id: 'pastel', name: '清新浅色' },
 ]
 
 // 强调色和页眉底色独立，浅色页眉可使用深色文字及清晰的栏目标题。
@@ -189,6 +190,87 @@ export const resumePalettes: ResumePalette[] = [
     onHeader: '#27495f',
     soft: '#f2f7fb',
     line: '#bcd3e2',
+  },
+  // 浅底搭配深色文字和强调色；同一套颜色也用于信息侧栏及白色页眉版式。
+  {
+    id: 'sky',
+    name: '晴空浅蓝',
+    group: 'pastel',
+    strong: '#315c80',
+    header: '#dceeff',
+    onHeader: '#23435e',
+    soft: '#f0f7ff',
+    line: '#b7d4ed',
+  },
+  {
+    id: 'mist',
+    name: '雾蓝白',
+    group: 'pastel',
+    strong: '#4a6078',
+    header: '#eaf1f8',
+    onHeader: '#30455d',
+    soft: '#f5f8fc',
+    line: '#c8d5e4',
+  },
+  {
+    id: 'mint',
+    name: '薄荷浅绿',
+    group: 'pastel',
+    strong: '#326650',
+    header: '#def3e8',
+    onHeader: '#244c3a',
+    soft: '#f0faf5',
+    line: '#b7dcc9',
+  },
+  {
+    id: 'aqua',
+    name: '水光浅青',
+    group: 'pastel',
+    strong: '#2f636b',
+    header: '#ddf2f3',
+    onHeader: '#244b52',
+    soft: '#eff9fa',
+    line: '#b4dadd',
+  },
+  {
+    id: 'rose',
+    name: '樱花浅粉',
+    group: 'pastel',
+    strong: '#815061',
+    header: '#f8e5ec',
+    onHeader: '#603746',
+    soft: '#fdf4f7',
+    line: '#e5bfcd',
+  },
+  {
+    id: 'peach',
+    name: '暖杏浅橙',
+    group: 'pastel',
+    strong: '#805439',
+    header: '#fbead9',
+    onHeader: '#5e3e29',
+    soft: '#fdf6ee',
+    line: '#e6cbb0',
+  },
+  {
+    id: 'lilac',
+    name: '丁香浅紫',
+    group: 'pastel',
+    strong: '#655184',
+    header: '#e9e5f8',
+    onHeader: '#493960',
+    soft: '#f5f3fc',
+    line: '#cfc4e8',
+  },
+  {
+    id: 'pearl',
+    name: '珍珠浅灰',
+    group: 'pastel',
+    strong: '#525f70',
+    header: '#edf0f4',
+    onHeader: '#344050',
+    soft: '#f7f8fa',
+    line: '#cbd2dc',
   },
 ]
 

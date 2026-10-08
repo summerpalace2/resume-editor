@@ -1,8 +1,19 @@
 /** @file 外部数据的完整运行时边界；导入、数据库读取及写入共用同一契约。 */
-import type { ResumeDocument, ResumeEntry, ResumeSection, SectionKind } from '../types'
+import type {
+  ResumeDocument,
+  ResumeEntry,
+  ResumeSection,
+  SectionKind,
+  TextFormatRange,
+} from '../types'
+import { normalizeFormats, splitsSurrogate } from './textFormatting'
 import { isResumeTemplateId } from '../data/templates'
 import { isAccentChoice } from '../data/palettes'
-import { baseFontOptions, hasValidHeaderTypography } from '../data/typography'
+import {
+  baseFontOptions,
+  hasValidHeaderTypography,
+  paragraphSpacingOption,
+} from '../data/typography'
 
 export class DocumentValidationError extends Error {
   constructor(path: string, expected: string) {
@@ -33,9 +44,60 @@ function uniqueIds(items: { id: string }[], path: string): void {
     throw new DocumentValidationError(path, '存在重复 ID')
 }
 
+/** 可选格式字段兼容旧文档；越界、重叠和非十六进制颜色拒绝进入数据库。 */
+function parseFormats(value: unknown, content: string, path: string): TextFormatRange[] {
+  if (value === undefined) return []
+  let previousEnd = 0
+  const ranges = list(value, path).map((item, index) => {
+    const range = record(item, `${path}[${index}]`)
+    if (
+      !Number.isSafeInteger(range.start) ||
+      !Number.isSafeInteger(range.end) ||
+      (range.start as number) < previousEnd ||
+      (range.start as number) >= (range.end as number) ||
+      (range.end as number) > content.length ||
+      splitsSurrogate(content, range.start as number) ||
+      splitsSurrogate(content, range.end as number)
+    )
+      throw new DocumentValidationError(
+        `${path}[${index}]`,
+        '文字格式区间越界、无序或重叠',
+      )
+    if (range.bold !== undefined && range.bold !== true)
+      throw new DocumentValidationError(`${path}[${index}].bold`, '应为 true 或省略')
+    if (
+      range.color !== undefined &&
+      (typeof range.color !== 'string' || !/^#[\da-f]{6}$/i.test(range.color))
+    )
+      throw new DocumentValidationError(`${path}[${index}].color`, '应为六位十六进制颜色')
+    previousEnd = range.end as number
+    return {
+      start: range.start as number,
+      end: range.end as number,
+      ...(range.bold === true ? { bold: true as const } : {}),
+      ...(typeof range.color === 'string' ? { color: range.color.toLowerCase() } : {}),
+    }
+  })
+  return normalizeFormats(ranges)
+}
+
+function parseFormatMap(
+  value: unknown,
+  fields: Record<string, string>,
+  path: string,
+): Record<string, TextFormatRange[]> {
+  const formats = record(value, path)
+  const result: Record<string, TextFormatRange[]> = {}
+  for (const key of Object.keys(fields)) {
+    if (Object.hasOwn(formats, key))
+      result[key] = parseFormats(formats[key], fields[key]!, `${path}.${key}`)
+  }
+  return result
+}
+
 function parseEntry(value: unknown, path: string): ResumeEntry {
   const entry = record(value, path)
-  return {
+  const parsed: ResumeEntry = {
     id: text(entry.id, `${path}.id`, true),
     title: text(entry.title, `${path}.title`),
     subtitle: text(entry.subtitle, `${path}.subtitle`),
@@ -44,6 +106,19 @@ function parseEntry(value: unknown, path: string): ResumeEntry {
     // 旧版没有项目链接；只补这一已知可选字段，不修正无效的必填数据。
     ...(entry.link === undefined ? {} : { link: text(entry.link, `${path}.link`) }),
   }
+  if (entry.textFormats !== undefined)
+    parsed.textFormats = parseFormatMap(
+      entry.textFormats,
+      {
+        title: parsed.title,
+        subtitle: parsed.subtitle,
+        period: parsed.period,
+        description: parsed.description,
+        link: parsed.link ?? '',
+      },
+      `${path}.textFormats`,
+    )
+  return parsed
 }
 
 const sectionKinds: SectionKind[] = [
@@ -77,6 +152,15 @@ function parseSection(value: unknown, path: string): ResumeSection {
     visible: section.visible,
     ...(section.column === undefined ? {} : { column: section.column }),
     entries,
+    ...(section.titleFormats === undefined
+      ? {}
+      : {
+          titleFormats: parseFormats(
+            section.titleFormats,
+            section.title as string,
+            `${path}.titleFormats`,
+          ),
+        }),
   }
 }
 
@@ -115,6 +199,17 @@ export function parseResumeDocument(value: unknown, path = '简历'): ResumeDocu
   if (!hasValidHeaderTypography(appearance))
     throw new DocumentValidationError(`${path}.appearance`, '头部或个人信息字号无效')
   if (
+    appearance.paragraphSpacing !== undefined &&
+    (typeof appearance.paragraphSpacing !== 'number' ||
+      !Number.isFinite(appearance.paragraphSpacing) ||
+      appearance.paragraphSpacing < paragraphSpacingOption.min ||
+      appearance.paragraphSpacing > paragraphSpacingOption.max)
+  )
+    throw new DocumentValidationError(
+      `${path}.appearance.paragraphSpacing`,
+      `段落间距应在 ${paragraphSpacingOption.min}～${paragraphSpacingOption.max}px 内`,
+    )
+  if (
     typeof resume.updatedAt !== 'number' ||
     !Number.isSafeInteger(resume.updatedAt) ||
     resume.updatedAt < 0 ||
@@ -134,7 +229,7 @@ export function parseResumeDocument(value: unknown, path = '简历'): ResumeDocu
     parseSection(section, `${path}.sections[${index}]`),
   )
   uniqueIds(sections, `${path}.sections`)
-  return {
+  const parsed: ResumeDocument = {
     id: text(resume.id, `${path}.id`, true),
     title: text(resume.title, `${path}.title`),
     templateId: resume.templateId,
@@ -166,6 +261,9 @@ export function parseResumeDocument(value: unknown, path = '简历'): ResumeDocu
       nameScale: appearance.nameScale as number,
       headingScale: appearance.headingScale as number,
       bodyScale: appearance.bodyScale as number,
+      ...(appearance.paragraphSpacing === undefined
+        ? {}
+        : { paragraphSpacing: appearance.paragraphSpacing as number }),
       font: appearance.font as ResumeDocument['appearance']['font'],
       accent: appearance.accent,
       ...(appearance.headerFontSizes === undefined
@@ -177,6 +275,33 @@ export function parseResumeDocument(value: unknown, path = '简历'): ResumeDocu
     },
     updatedAt: resume.updatedAt,
   }
+  if (profile.textFormats !== undefined)
+    parsed.profile.textFormats = parseFormatMap(
+      profile.textFormats,
+      {
+        name: parsed.profile.name,
+        role: parsed.profile.role,
+        email: parsed.profile.email,
+        phone: parsed.profile.phone,
+        location: parsed.profile.location,
+        github: parsed.profile.github ?? '',
+        summary: parsed.profile.summary,
+      },
+      `${path}.profile.textFormats`,
+    )
+  if (profile.profileLineFormats !== undefined) {
+    const lines = parsed.profile.profileLines ?? []
+    const formats = list(profile.profileLineFormats, `${path}.profile.profileLineFormats`)
+    if (formats.length > lines.length)
+      throw new DocumentValidationError(
+        `${path}.profile.profileLineFormats`,
+        '格式行数不能超过个人信息行数',
+      )
+    parsed.profile.profileLineFormats = formats.map((item, index) =>
+      parseFormats(item, lines[index]!, `${path}.profile.profileLineFormats[${index}]`),
+    )
+  }
+  return parsed
 }
 
 /** 数据库快照要求文档 ID 唯一；备份合并则由 store 重生成冲突文档 ID。 */

@@ -1,6 +1,6 @@
 /** @file 将文档外观编排为响应式 CSS 变量；字体就绪后重新测量侧栏。 */
 import { computed, ref, onMounted, onUnmounted } from 'vue'
-import { headerFontSize, profileLineFontSize } from '../data/typography'
+import { headerFontSize, profileLineFontSize, paragraphSpacing } from '../data/typography'
 import { getResumePalette } from '../data/palettes'
 import { isSidebarTemplate } from '../data/templates'
 import { githubLabel } from '../domain/links'
@@ -69,6 +69,7 @@ export function useResumeStyle(resume: () => ResumeDocument) {
       '--name-size': `${resume().appearance.nameScale}px`,
       '--heading-size': `${resume().appearance.headingScale}px`,
       '--body-size': `${resume().appearance.bodyScale}px`,
+      '--paragraph-spacing': `${paragraphSpacing(appearance)}px`,
       '--role-size': `${size('role')}px`,
       '--github-size': `${size('github')}px`,
       '--email-size': `${size('email')}px`,

@@ -4,14 +4,19 @@ import { isColumnTemplate, resolveSectionColumn } from '../data/templates'
 import type {
   ResumeDocument,
   ResumeEntry,
-  ResumeProfile,
   ResumeSection,
   SectionColumn,
+  ProfileTextField,
+  EntryTextField,
+  TextFormatRange,
 } from '../types'
+import { rebaseFormats } from './textFormatting'
 
-export type ProfileTextKey = Exclude<keyof ResumeProfile, 'profileLines' | 'photo'>
-export type EntryTextKey = Exclude<keyof ResumeEntry, 'id'>
-export type SectionPatch = Partial<Pick<ResumeSection, 'title' | 'visible'>>
+export type ProfileTextKey = ProfileTextField
+export type EntryTextKey = EntryTextField
+export type SectionPatch = Partial<
+  Pick<ResumeSection, 'title' | 'visible' | 'titleFormats'>
+>
 export type DraftOperation = (draft: ResumeDocument) => boolean
 
 function validIndex(index: number, length: number): boolean {
@@ -22,8 +27,13 @@ export function updateProfile(
   draft: ResumeDocument,
   key: ProfileTextKey,
   value: string,
+  formats?: TextFormatRange[],
 ): boolean {
-  if (draft.profile[key] === value) return false
+  const previous = draft.profile.textFormats?.[key] ?? []
+  const next = formats ?? rebaseFormats(draft.profile[key] ?? '', value, previous)
+  if (draft.profile[key] === value && JSON.stringify(previous) === JSON.stringify(next))
+    return false
+  draft.profile.textFormats = { ...draft.profile.textFormats, [key]: next }
   draft.profile[key] = value
   return true
 }
@@ -33,17 +43,22 @@ export function updateProfileLine(
   draft: ResumeDocument,
   index: number,
   value: string,
+  formats?: TextFormatRange[],
 ): boolean {
   const lines = draft.profile.profileLines ?? []
-  if (
-    !Number.isInteger(index) ||
-    index < 0 ||
-    index > lines.length ||
-    lines[index] === value
-  )
+  if (!Number.isInteger(index) || index < 0 || index > lines.length) return false
+  const previous = draft.profile.profileLineFormats?.[index] ?? []
+  const next = formats ?? rebaseFormats(lines[index] ?? '', value, previous)
+  if (lines[index] === value && JSON.stringify(previous) === JSON.stringify(next))
     return false
   draft.profile.profileLines = [...lines]
   draft.profile.profileLines[index] = value
+  const lineFormats = Array.from(
+    { length: draft.profile.profileLines.length },
+    (_, i) => draft.profile.profileLineFormats?.[i] ?? [],
+  )
+  lineFormats[index] = next
+  draft.profile.profileLineFormats = lineFormats
   return true
 }
 
@@ -54,6 +69,11 @@ export function updateSection(
 ): boolean {
   const section = draft.sections.find((item) => item.id === id)
   if (!section) return false
+  if (patch.title !== undefined && patch.titleFormats === undefined)
+    patch = {
+      ...patch,
+      titleFormats: rebaseFormats(section.title, patch.title, section.titleFormats),
+    }
   if (
     Object.entries(patch).every(
       ([key, value]) => section[key as keyof SectionPatch] === value,
@@ -70,11 +90,17 @@ export function updateEntry(
   entryId: string,
   key: EntryTextKey,
   value: string,
+  formats?: TextFormatRange[],
 ): boolean {
   const entry = draft.sections
     .find((section) => section.id === sectionId)
     ?.entries.find((item) => item.id === entryId)
-  if (!entry || entry[key] === value) return false
+  if (!entry) return false
+  const previous = entry.textFormats?.[key] ?? []
+  const next = formats ?? rebaseFormats(entry[key] ?? '', value, previous)
+  if (entry[key] === value && JSON.stringify(previous) === JSON.stringify(next))
+    return false
+  entry.textFormats = { ...entry.textFormats, [key]: next }
   entry[key] = value
   return true
 }

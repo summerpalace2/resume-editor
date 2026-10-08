@@ -42,9 +42,13 @@ const {
         <InlineEdit
           class="section-title"
           :model-value="section.title"
+          :formats="section.titleFormats"
           :editing="editing"
           placeholder="栏目名称"
-          @update:model-value="updateSection(section.id, { title: $event })"
+          @commit="
+            (value, formats) =>
+              updateSection(section.id, { title: value, titleFormats: formats })
+          "
         />
       </div>
       <div v-if="editing" class="section-tools no-print">

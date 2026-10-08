@@ -2,6 +2,7 @@
 import type { ResumeAppearance, ResumeDocument } from '../types'
 import { cloneData } from './clone'
 import { createEntry, createSection } from '../domain/factories'
+import { paragraphSpacingOption } from './typography'
 export { createEntry, createSection } from '../domain/factories'
 
 /** 默认字号以逻辑画布 px 表示；新增文档复制此对象，避免共用可变外观状态。 */
@@ -9,6 +10,7 @@ export const appearanceDefaults: ResumeAppearance = {
   nameScale: 50,
   headingScale: 24,
   bodyScale: 20,
+  paragraphSpacing: paragraphSpacingOption.default,
   font: 'modern',
   accent: 'ocean',
 }

@@ -26,9 +26,10 @@ const {
         <InlineEdit
           class="resume-name"
           :model-value="resume.profile.name"
+          :formats="resume.profile.textFormats?.name"
           :editing="editing"
           placeholder="填写姓名"
-          @update:model-value="updateProfile('name', $event)"
+          @commit="(value, formats) => updateProfile('name', value, formats)"
         />
         <a
           v-if="!editing && githubUrl(resume.profile.github)"
@@ -55,9 +56,10 @@ const {
       <div class="resume-role">
         <InlineEdit
           :model-value="resume.profile.role"
+          :formats="resume.profile.textFormats?.role"
           :editing="editing"
           placeholder="填写求职意向"
-          @update:model-value="updateProfile('role', $event)"
+          @commit="(value, formats) => updateProfile('role', value, formats)"
         />
       </div>
     </div>
@@ -70,9 +72,10 @@ const {
           class="profile-line"
           :style="{ fontSize: `${profileLineFontSize(resume.appearance, index)}px` }"
           :model-value="line"
+          :formats="resume.profile.profileLineFormats?.[index]"
           :editing="editing"
           placeholder="添加个人信息"
-          @update:model-value="updateProfileLine(index, $event)"
+          @commit="(value, formats) => updateProfileLine(index, value, formats)"
         />
         <button
           v-if="editing"
@@ -90,9 +93,10 @@ const {
         >
           <InlineEdit
             :model-value="resume.profile.email"
+            :formats="resume.profile.textFormats?.email"
             :editing="editing"
             placeholder="添加邮箱"
-            @update:model-value="updateProfile('email', $event)"
+            @commit="(value, formats) => updateProfile('email', value, formats)"
           />
           <span aria-hidden="true">✉</span>
         </div>
@@ -102,9 +106,10 @@ const {
         >
           <InlineEdit
             :model-value="resume.profile.phone"
+            :formats="resume.profile.textFormats?.phone"
             :editing="editing"
             placeholder="添加电话"
-            @update:model-value="updateProfile('phone', $event)"
+            @commit="(value, formats) => updateProfile('phone', value, formats)"
           />
           <span aria-hidden="true">☎</span>
         </div>
@@ -114,9 +119,10 @@ const {
         >
           <InlineEdit
             :model-value="resume.profile.location"
+            :formats="resume.profile.textFormats?.location"
             :editing="editing"
             placeholder="添加城市"
-            @update:model-value="updateProfile('location', $event)"
+            @commit="(value, formats) => updateProfile('location', value, formats)"
           />
           <span aria-hidden="true">⌖</span>
         </div>

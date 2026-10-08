@@ -1,9 +1,9 @@
 <script setup lang="ts">
 /** @file 当前简历的版式、字体与配色设置页面；使用共享画布实时预览。 */
-import { computed, ref } from 'vue'
+import { computed, ref, useTemplateRef } from 'vue'
 import { useRouter } from 'vue-router'
 import { useResumeStore } from '../stores/resumes'
-import ResumePreview from '../components/ResumePreview.vue'
+import ResumePreviewViewport from '../components/ResumePreviewViewport.vue'
 import TemplateThumbnail from '../components/TemplateThumbnail.vue'
 import { paletteGroups, resumePalettes } from '../data/palettes'
 import {
@@ -17,6 +17,8 @@ import {
   headerFontOptions,
   headerFontSize,
   profileLineFontSize,
+  paragraphSpacing,
+  paragraphSpacingOption,
 } from '../data/typography'
 import type {
   AccentChoice,
@@ -27,8 +29,40 @@ import type {
 
 const store = useResumeStore()
 const router = useRouter()
+const previewDialog = useTemplateRef<HTMLDialogElement>('previewDialog')
+const expandedPreview = ref(false)
+/** 原生对话框负责焦点约束和 Escape，关闭后仍保留小预览的查看位置。 */
+function openPreview(): void {
+  previewDialog.value?.showModal()
+  expandedPreview.value = true
+}
+
+function closePreview(): void {
+  previewDialog.value?.close()
+}
 /** 当前文档外观只供读取；所有修改经 store 动作校验、更新时间和保存。 */
 const appearance = computed(() => store.activeResume?.appearance)
+const currentParagraphSpacing = computed(() =>
+  appearance.value ? paragraphSpacing(appearance.value) : paragraphSpacingOption.default,
+)
+
+/** 滑杆与数值框共用动作；空值不提交，越界输入限幅后再交给文档校验。 */
+function updateParagraphSpacing(event: Event): void {
+  if (!store.activeResume || !(event.target instanceof HTMLInputElement)) return
+  const value = event.target.valueAsNumber
+  if (!Number.isFinite(value)) {
+    event.target.value = String(currentParagraphSpacing.value)
+    return
+  }
+  const spacing = Math.min(
+    paragraphSpacingOption.max,
+    Math.max(paragraphSpacingOption.min, value),
+  )
+  event.target.value = String(spacing)
+  store.updateAppearance(store.activeResume.id, {
+    paragraphSpacing: spacing,
+  })
+}
 /** 当前界面与画布使用同一字号解析器，旧文档缺省值保持一致。 */
 function getHeaderSize(target: HeaderFontTarget): number {
   const resume = store.activeResume
@@ -133,6 +167,40 @@ function selectAccent(id: AccentChoice): void {
         <p class="muted">
           调整后会立即预览，并只应用于“{{ store.activeResume.title }}”。
         </p>
+
+        <section class="setting-card">
+          <div class="setting-heading">
+            <div>
+              <h2>段落间距</h2>
+              <p>调整正文换行段落和列表项之间的间隔，自动折行保留原行距</p>
+            </div>
+          </div>
+          <label class="range-setting">
+            <span
+              >正文段落 <strong>{{ currentParagraphSpacing }} px</strong></span
+            >
+            <span class="paragraph-spacing-controls">
+              <input
+                type="range"
+                aria-label="正文段落间距"
+                :min="paragraphSpacingOption.min"
+                :max="paragraphSpacingOption.max"
+                step="1"
+                :value="currentParagraphSpacing"
+                @input="updateParagraphSpacing"
+              />
+              <input
+                type="number"
+                aria-label="输入正文段落间距"
+                :min="paragraphSpacingOption.min"
+                :max="paragraphSpacingOption.max"
+                step="1"
+                :value="currentParagraphSpacing"
+                @change="updateParagraphSpacing"
+              />
+            </span>
+          </label>
+        </section>
 
         <section class="setting-card">
           <div class="setting-heading">
@@ -326,11 +394,32 @@ function selectAccent(id: AccentChoice): void {
           <span>实时预览</span>
           <span>A4 · {{ getResumeTemplate(store.activeResume.templateId).name }}</span>
         </div>
-        <div class="settings-resume-preview">
-          <ResumePreview :resume="store.activeResume" :editing="false" />
-        </div>
-        <p class="preview-note">所有调整会自动保存到当前简历。</p>
+        <ResumePreviewViewport :resume="store.activeResume">
+          <template #actions>
+            <button type="button" class="preview-expand" @click="openPreview">
+              ⛶ 展开预览
+            </button>
+          </template>
+        </ResumePreviewViewport>
+        <p class="preview-note">样式调整会自动保存到当前简历。</p>
       </aside>
     </div>
+    <dialog
+      ref="previewDialog"
+      class="preview-dialog no-print"
+      aria-labelledby="expanded-preview-title"
+      @close="expandedPreview = false"
+    >
+      <header class="preview-dialog-header">
+        <div>
+          <h2 id="expanded-preview-title">简历大预览</h2>
+          <span>A4 · {{ getResumeTemplate(store.activeResume.templateId).name }}</span>
+        </div>
+        <button type="button" class="button button-quiet" @click="closePreview">
+          收起预览 · Esc
+        </button>
+      </header>
+      <ResumePreviewViewport v-if="expandedPreview" :resume="store.activeResume" large />
+    </dialog>
   </main>
 </template>

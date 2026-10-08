@@ -1,6 +1,8 @@
 <script setup lang="ts">
 /** @file 单条经历的展示、链接、字段编辑和排序按钮；不访问工作区存储。 */
+import { nextTick, ref, watch } from 'vue'
 import InlineEdit from '../../components/InlineEdit.vue'
+import FormattedText from '../../components/FormattedText.vue'
 import { useResumeEditing } from '../../composables/useResumeEditing'
 import { externalUrl } from '../../domain/links'
 import { hasEntryContent } from '../../domain/operations'
@@ -24,6 +26,35 @@ const {
   () => props.resume,
   (resume) => emit('update:resume', resume),
 )
+
+// 展开状态只属于当前条目的交互，所有栏目共用已存在的 entry.link 数据契约。
+const linkEditorOpen = ref(false)
+const linkInput = ref<HTMLInputElement | null>(null)
+
+async function openLinkEditor(): Promise<void> {
+  linkEditorOpen.value = true
+  await nextTick()
+  linkInput.value?.focus()
+  linkInput.value?.select()
+}
+
+function finishLinkEditor(): void {
+  // blur 会先触发 change，沿用统一修改动作保存地址，再收起输入框。
+  linkInput.value?.blur()
+  linkEditorOpen.value = false
+}
+
+watch(
+  [
+    () => props.resume.id,
+    () => props.section.id,
+    () => props.entry.id,
+    () => props.editing,
+  ],
+  () => {
+    linkEditorOpen.value = false
+  },
+)
 </script>
 
 <template>
@@ -38,9 +69,12 @@ const {
         <InlineEdit
           class="entry-title"
           :model-value="entry.title"
+          :formats="entry.textFormats?.title"
           :editing="editing"
           placeholder="条目标题"
-          @update:model-value="updateEntry(section.id, entry.id, 'title', $event)"
+          @commit="
+            (value, formats) => updateEntry(section.id, entry.id, 'title', value, formats)
+          "
         />
         <a
           v-if="!editing && externalUrl(entry.link)"
@@ -49,7 +83,7 @@ const {
           target="_blank"
           rel="noopener noreferrer"
           :aria-label="`打开${entry.title}链接`"
-          title="打开项目链接"
+          title="打开链接"
         >
           <svg viewBox="0 0 20 20" aria-hidden="true">
             <path d="M11 3h6v6M17 3 9 11" />
@@ -57,49 +91,76 @@ const {
           </svg>
           <span>跳转</span>
         </a>
-        <label
-          v-else-if="editing && section.kind === 'projects'"
-          class="entry-link-editor"
+        <button
+          v-else-if="editing && !linkEditorOpen"
+          type="button"
+          class="entry-title-link no-print"
+          @click="openLinkEditor"
         >
+          {{ entry.link?.trim() ? '修改链接' : '+ 添加链接' }}
+        </button>
+        <label v-if="editing && linkEditorOpen" class="entry-link-editor no-print">
           <span aria-hidden="true">↗</span>
           <input
+            ref="linkInput"
             class="link-address-input entry-link-input"
             type="url"
             :value="entry.link ?? ''"
-            placeholder="添加项目链接"
-            :aria-label="`${entry.title || '项目'}链接地址`"
+            placeholder="输入链接地址"
+            :aria-label="`${entry.title || '条目'}链接地址`"
             @change="updateEntryLinkFromInput(section.id, entry.id, $event)"
+            @blur="linkEditorOpen = false"
+            @keydown.enter.prevent="finishLinkEditor"
           />
         </label>
       </div>
       <InlineEdit
         class="entry-period"
         :model-value="entry.period"
+        :formats="entry.textFormats?.period"
         :editing="editing"
         placeholder="时间"
-        @update:model-value="updateEntry(section.id, entry.id, 'period', $event)"
+        @commit="
+          (value, formats) => updateEntry(section.id, entry.id, 'period', value, formats)
+        "
       />
     </div>
     <InlineEdit
       v-if="entry.subtitle || editing"
       class="entry-subtitle"
       :model-value="entry.subtitle"
+      :formats="entry.textFormats?.subtitle"
       :editing="editing"
+      multiline
+      tag="div"
       placeholder="机构、专业或技术栈"
-      @update:model-value="updateEntry(section.id, entry.id, 'subtitle', $event)"
+      @commit="
+        (value, formats) => updateEntry(section.id, entry.id, 'subtitle', value, formats)
+      "
     />
     <div v-if="entry.description || editing" class="entry-description">
       <InlineEdit
         v-if="editing"
         class="description-edit"
         :model-value="entry.description"
+        :formats="entry.textFormats?.description"
         :editing="editing"
         multiline
+        list-enabled
         tag="div"
-        placeholder="添加描述，换行和列表符号由你自行输入"
-        @update:model-value="updateEntry(section.id, entry.id, 'description', $event)"
+        placeholder="添加描述；选中段落后可添加无序列表"
+        @commit="
+          (value, formats) =>
+            updateEntry(section.id, entry.id, 'description', value, formats)
+        "
       />
-      <p v-else class="description-readonly">{{ entry.description }}</p>
+      <p v-else class="description-readonly">
+        <FormattedText
+          :text="entry.description"
+          :formats="entry.textFormats?.description"
+          paragraphs
+        />
+      </p>
     </div>
     <div v-if="editing" class="entry-tools no-print">
       <button

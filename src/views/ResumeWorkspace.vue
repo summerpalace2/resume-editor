@@ -1,13 +1,17 @@
 <script setup lang="ts">
 /** @file 编辑工作区页面：连接 store 与画布，管理编辑模式、保存提示和 PDF 导出。 */
-import { nextTick, ref, watch } from 'vue'
+import { nextTick, ref, useTemplateRef, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import ResumePreview from '../components/ResumePreview.vue'
+import PreviewZoomControls from '../components/PreviewZoomControls.vue'
+import { usePreviewZoom } from '../composables/usePreviewZoom'
 import { useResumeStore } from '../stores/resumes'
 import type { ResumeDocument } from '../types'
 
 const store = useResumeStore()
 const router = useRouter()
+const stage = useTemplateRef<HTMLElement>('stage')
+const { fitWidth, zoomPercent, minZoom, maxZoom, setZoom } = usePreviewZoom(stage)
 /** 路由页面的临时交互状态，不写入简历文档。 */
 const editing = ref(false)
 /** 导出准备期间阻止重复触发，打印窗口结束后释放。 */
@@ -33,7 +37,7 @@ function statusText(): string {
   if (store.saveErrorMessage?.includes('当前预览环境')) return '预览环境不支持本地保存'
   if (store.saveState === 'error') return '本地保存失败'
   if (store.saveState === 'loading') return '正在读取…'
-  return '已保存在本机'
+  return '已保存在当前浏览器'
 }
 
 /**
@@ -103,18 +107,32 @@ watch(
 
     <div class="workspace-hint no-print">
       <span v-if="editing"
-        ><strong>编辑模式</strong> · 点击简历中的文字即可修改，修改会自动保存。</span
+        ><strong>编辑模式</strong> ·
+        点击简历中的文字即可修改，修改会自动保存到当前浏览器。</span
       >
-      <span v-else>这是你的简历预览。点击“编辑简历”即可直接修改内容。</span>
+      <span v-else
+        >点击“编辑简历”即可修改内容。简历数据仅保存在当前浏览器，不会上传服务器。</span
+      >
       <button v-if="editing" class="hint-close" @click="toggleEditing">完成</button>
     </div>
 
-    <section class="resume-stage">
-      <ResumePreview
-        :resume="store.activeResume"
-        :editing="editing"
-        @update:resume="updateResume"
-      />
+    <PreviewZoomControls
+      :percent="zoomPercent"
+      :fit-width="fitWidth"
+      :min="minZoom"
+      :max="maxZoom"
+      @change="setZoom"
+      @fit="fitWidth = true"
+    />
+
+    <section ref="stage" class="resume-stage resume-stage--zoomable">
+      <div class="preview-zoom-frame" :style="{ '--preview-zoom': zoomPercent / 100 }">
+        <ResumePreview
+          :resume="store.activeResume"
+          :editing="editing"
+          @update:resume="updateResume"
+        />
+      </div>
     </section>
   </main>
 </template>
