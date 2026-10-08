@@ -1,7 +1,7 @@
 <script setup lang="ts">
 /**
  * @file 预览公共入口：转发文档、编辑开关及修改事件，隔离页面对具体画布的依赖。
- * 八种版式复用 ResumeCanvas，页眉、栏目和条目分别维护。
+ * 所有版式复用 ResumeCanvas，页眉、栏目和条目分别维护。
  */
 import ResumeCanvas from '../templates/ResumeCanvas.vue'
 import type { ResumeDocument } from '../types'

@@ -209,4 +209,73 @@ const paletteStyle = computed(() => {
   background: var(--thumbnail-accent);
   content: '';
 }
+.thumbnail-ats-classic .thumbnail-header {
+  justify-content: end;
+  background: #fff;
+  border-bottom: 1px solid var(--thumbnail-line);
+}
+.thumbnail-ats-classic .thumbnail-header b {
+  width: 58%;
+  background: #263449;
+}
+.thumbnail-ats-classic .thumbnail-body {
+  grid-template-columns: 1fr;
+}
+.thumbnail-ats-classic .thumbnail-column b {
+  background: #596679;
+}
+.thumbnail-academic .thumbnail-header {
+  align-items: center;
+  justify-content: center;
+  border-bottom: 2px double var(--thumbnail-line);
+}
+.thumbnail-academic .thumbnail-header b,
+.thumbnail-academic .thumbnail-header em,
+.thumbnail-academic .thumbnail-header i {
+  width: 55%;
+}
+.thumbnail-academic .thumbnail-body {
+  grid-template-columns: 1fr;
+}
+.thumbnail-academic .thumbnail-column b {
+  background: var(--thumbnail-line);
+}
+.thumbnail-modern-clean .thumbnail-header {
+  justify-content: end;
+  border-bottom: calc(var(--unit) * 1.5) solid var(--thumbnail-line);
+}
+.thumbnail-modern-clean .thumbnail-header b {
+  width: 66%;
+}
+.thumbnail-modern-clean .thumbnail-body {
+  grid-template-columns: 1fr;
+}
+.thumbnail-portfolio .thumbnail-header {
+  border-bottom: calc(var(--unit) * 1.5) solid var(--thumbnail-accent);
+}
+.thumbnail-portfolio .thumbnail-body {
+  grid-template-columns: 34% 1fr;
+}
+.thumbnail-portfolio .thumbnail-column:first-child {
+  padding-right: var(--unit);
+  border-right: 1px solid var(--thumbnail-line);
+}
+.thumbnail-compact .thumbnail-header {
+  padding: var(--unit) calc(var(--unit) * 2);
+}
+.thumbnail-compact .thumbnail-body {
+  grid-template-columns: 1fr;
+  gap: var(--unit);
+}
+.thumbnail-compact .thumbnail-column {
+  gap: var(--unit);
+}
+.thumbnail-creative-rail .thumbnail-body {
+  grid-template-columns: 1fr;
+  border-left: calc(var(--unit) * 1.5) solid var(--thumbnail-line);
+  margin-left: calc(var(--unit) * 3);
+}
+.thumbnail-creative-rail .thumbnail-column b {
+  background: var(--thumbnail-accent);
+}
 </style>

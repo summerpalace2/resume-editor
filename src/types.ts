@@ -102,6 +102,12 @@ export type ResumeTemplateId =
   | 'editorial'
   | 'timeline'
   | 'sidebar-right'
+  | 'ats-classic'
+  | 'academic'
+  | 'modern-clean'
+  | 'portfolio'
+  | 'compact'
+  | 'creative-rail'
 export type HeaderFontTarget = 'role' | 'github' | 'email' | 'phone' | 'location'
 
 /** 外观设置中的字号都是 1024px 逻辑画布的 px 值，Scale 并非缩放倍数。 */

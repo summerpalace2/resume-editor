@@ -1,5 +1,5 @@
 <script setup lang="ts">
-/** @file 八种版式的共用画布入口；只编排列组和展示组件，不持有存储状态。 */
+/** @file 多种版式共用的画布入口；只编排列组和展示组件，不持有存储状态。 */
 import { computed } from 'vue'
 import ResumeHeader from './components/ResumeHeader.vue'
 import ResumeSection from './components/ResumeSection.vue'

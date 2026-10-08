@@ -1,4 +1,4 @@
-/* 文件职责：八种版式的展示差异；保持共用画布与数据，不定义存储或导出流程。 */
+/* 文件职责：版式的展示差异；保持共用画布与数据，不定义存储或导出流程。 */
 /* 新版式沿用同一画布和字号变量，屏幕与打印只切换排版。 */
 .resume-page.light-header .resume-masthead {
   min-height: 210px;
@@ -199,6 +199,207 @@
   border: 3px solid var(--accent);
   border-radius: 50%;
   background: #fff;
+}
+
+/* ATS 经典单栏减少装饰层级，让标题和正文保持连续、清楚的阅读顺序。 */
+.resume-page.layout-ats-classic .resume-masthead {
+  min-height: 150px;
+  padding: 24px 52px 16px;
+  border-bottom: 1px solid #cbd2dc;
+}
+.resume-page.layout-ats-classic .masthead-top {
+  border-bottom: 0;
+}
+.resume-page.layout-ats-classic .masthead-bottom {
+  flex-direction: row;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  padding-top: 7px;
+}
+.resume-page.layout-ats-classic .profile-lines,
+.resume-page.layout-ats-classic .masthead-contacts {
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 4px 16px;
+}
+.resume-page.layout-ats-classic .resume-main {
+  padding: 22px 52px 36px;
+}
+.resume-page.layout-ats-classic .section-heading {
+  margin: 10px 0 5px;
+  padding: 0 0 4px;
+  border: 0;
+  border-bottom: 1px solid #697586;
+  background: transparent;
+}
+.resume-page.layout-ats-classic .section-title {
+  color: #202a36;
+  letter-spacing: 0.025em;
+}
+
+/* 学术履历用居中身份区和双细线标题区分栏目，不改变栏目内容顺序。 */
+.resume-page.layout-academic .resume-masthead {
+  min-height: 174px;
+  padding: 26px 52px 18px;
+  border-bottom: 3px double var(--accent-line);
+}
+.resume-page.layout-academic .masthead-top {
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  border: 0;
+  text-align: center;
+}
+.resume-page.layout-academic .masthead-identity {
+  justify-content: center;
+}
+.resume-page.layout-academic .github-handle {
+  border-left: 1px solid var(--accent-line);
+}
+.resume-page.layout-academic .masthead-bottom {
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  padding-top: 9px;
+}
+.resume-page.layout-academic .profile-lines,
+.resume-page.layout-academic .masthead-contacts {
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 3px 18px;
+}
+.resume-page.layout-academic .resume-main {
+  padding: 26px 58px 42px;
+}
+.resume-page.layout-academic .section-heading {
+  margin-top: 12px;
+  padding: 0 0 4px;
+  border: 0;
+  border-bottom: 3px double var(--accent-line);
+  background: transparent;
+}
+.resume-page.layout-academic .section-title {
+  color: #202a36;
+}
+
+/* 现代清爽保留彩色页眉，用细分隔线承接个人信息和经历区。 */
+.resume-page.layout-modern-clean .resume-masthead {
+  min-height: 184px;
+  padding: 28px 46px 22px;
+  border-radius: 0;
+}
+.resume-page.layout-modern-clean .masthead-top {
+  border-bottom-color: rgb(255 255 255 / 28%);
+}
+.resume-page.layout-modern-clean .masthead-bottom {
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+  padding-top: 10px;
+}
+.resume-page.layout-modern-clean .profile-lines,
+.resume-page.layout-modern-clean .masthead-contacts {
+  gap: 4px 16px;
+}
+.resume-page.layout-modern-clean .resume-main {
+  padding: 26px 46px 42px;
+}
+.resume-page.layout-modern-clean .section-heading {
+  padding: 3px 11px;
+  border-left-width: 4px;
+}
+
+/* 作品集强调栏目宽度：资历留在窄栏，项目和工作内容占主要阅读空间。 */
+.resume-page.layout-portfolio .resume-masthead {
+  min-height: 182px;
+  padding: 24px 40px 20px;
+  border-bottom: 2px solid var(--accent);
+}
+.resume-page.layout-portfolio .masthead-top {
+  border: 0;
+}
+.resume-page.layout-portfolio .resume-main {
+  gap: 28px;
+  padding: 26px 40px 40px;
+}
+.resume-page.layout-portfolio .resume-column-left {
+  flex: 0 0 34%;
+}
+.resume-page.layout-portfolio .resume-column-right {
+  flex: 1 1 0;
+}
+.resume-page.layout-portfolio .section-heading {
+  padding: 2px 9px;
+  border-left-width: 4px;
+}
+
+/* 紧凑求职减少固定装饰高度；打印仍由共享 A4 规则自然分页。 */
+.resume-page.layout-compact .resume-masthead {
+  min-height: 142px;
+  padding: 19px 38px 14px;
+  border-radius: 0;
+}
+.resume-page.layout-compact .masthead-top {
+  min-height: 58px;
+  padding-bottom: 8px;
+}
+.resume-page.layout-compact .masthead-bottom {
+  flex-direction: row;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  padding-top: 7px;
+}
+.resume-page.layout-compact .profile-lines,
+.resume-page.layout-compact .masthead-contacts {
+  gap: 2px 12px;
+}
+.resume-page.layout-compact .resume-main {
+  padding: 19px 38px 28px;
+}
+.resume-page.layout-compact .section-heading {
+  margin: 6px 0 3px;
+  padding-top: 0;
+  padding-bottom: 2px;
+}
+.resume-page.layout-compact .entry-description {
+  padding-top: 0.25em;
+  line-height: 1.42;
+}
+
+/* 创意侧线以短色块做栏目锚点，避免长色带挤占正文宽度。 */
+.resume-page.layout-creative-rail .resume-masthead {
+  min-height: 170px;
+  padding: 27px 52px 20px;
+  border-top: 6px solid var(--accent);
+}
+.resume-page.layout-creative-rail .resume-main {
+  padding: 25px 52px 40px 62px;
+}
+.resume-page.layout-creative-rail .resume-section {
+  position: relative;
+}
+.resume-page.layout-creative-rail .resume-section::before {
+  position: absolute;
+  top: 1px;
+  bottom: 0;
+  left: -19px;
+  width: 3px;
+  border-radius: 2px;
+  background: var(--accent-line);
+  content: '';
+}
+.resume-page.layout-creative-rail .section-heading {
+  padding: 1px 0 4px;
+  border: 0;
+  border-bottom: 1px solid var(--accent-line);
+  background: transparent;
+}
+.resume-page.layout-creative-rail .section-title {
+  color: var(--accent);
 }
 
 .resume-page.layout-sidebar-right {

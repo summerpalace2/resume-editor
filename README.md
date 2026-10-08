@@ -30,10 +30,10 @@
 
 点击图片可查看原图。
 
-| 预览内编辑                                                                      | 布局选择与实时预览                                                          |
-| ------------------------------------------------------------------------------- | --------------------------------------------------------------------------- |
-| ![编辑模式中的姓名输入、链接地址和栏目操作](docs/screenshots/inline-editor.png) | ![八种布局选择卡片与侧栏简历实时预览](docs/screenshots/layout-settings.png) |
-| 点选文字修改，设置个人主页和项目链接，调整栏目位置。                            | 按单栏、双栏或信息侧栏筛选，切换后立即预览。                                |
+| 预览内编辑                                                                      | 布局选择与实时预览                                                                    |
+| ------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
+| ![编辑模式中的姓名输入、链接地址和栏目操作](docs/screenshots/inline-editor.png) | ![新增前的布局选择页旧截图；当前提供十四种版式](docs/screenshots/layout-settings.png) |
+| 点选文字修改，设置个人主页和项目链接，调整栏目位置。                            | 十四种单栏、双栏和信息侧栏版式可筛选切换，并即时预览。                                |
 
 | 字体与主题配色                                                           | 多份简历管理                                                                   |
 | ------------------------------------------------------------------------ | ------------------------------------------------------------------------------ |
@@ -242,6 +242,6 @@ GitHub Actions 配置运行同一套静态检查，云端结果以仓库的 Acti
 
 ## 参考
 
-版式灵感来自 [Overleaf 极简模板](https://www.overleaf.com/latex/templates/latex-resume-template/ngdmzkwsbgmd)、[经典简历](https://www.overleaf.com/latex/templates/classic-clean-latex-cv-template/gfcvcxcftbsp)、[时间线简历](https://www.overleaf.com/latex/templates/curriculum-vitae-timeline-slash-cv/bsbyzcmxmvvq) 和 [Canva 简历分类](https://www.canva.com/create/cv/)。
+版式灵感参考 [Harvard Extension School 的简历样例](https://cdn-careerservices.fas.harvard.edu/wp-content/uploads/sites/161/2025/09/HES-Resume-samples-combined.pdf)、[Europass CV 结构说明](https://europass.europa.eu/en/create-europass-cv)、[Canva 简历分类](https://www.canva.com/resumes/templates/)、[Overleaf 极简模板](https://www.overleaf.com/latex/templates/latex-resume-template/ngdmzkwsbgmd)、[经典简历](https://www.overleaf.com/latex/templates/classic-clean-latex-cv-template/gfcvcxcftbsp) 和 [时间线简历](https://www.overleaf.com/latex/templates/curriculum-vitae-timeline-slash-cv/bsbyzcmxmvvq)。实现借鉴通用排版特征，没有复制第三方模板素材。
 
 架构评审参考 [Reactive Resume](https://github.com/reactive-resume/reactive-resume)、[OpenResume](https://github.com/xitanggg/open-resume) 及 Vue/Pinia 官方文档，详细比较保留在评审记录中。

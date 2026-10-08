@@ -29,7 +29,7 @@
 | `src/domain/links.ts`                        | HTTP(S) 地址规范化、GitHub 显示标签和编辑值                           |
 | `src/data/defaultResume.ts`                  | 空简历、首次示例及整份文档复制；不访问存储                            |
 | `src/data/clone.ts`                          | toRaw + structuredClone；只解除根代理，输入须可序列化                 |
-| `src/data/templates.ts`                      | 八种版式与结构分类，缺省栏目归属                                      |
+| `src/data/templates.ts`                      | 十四种版式与结构分类，缺省栏目归属                                    |
 | `src/data/palettes.ts`                       | 二十四套语义颜色与唯一主题校验，包含八套清新浅色                      |
 | `src/data/typography.ts`                     | 基础/头部字号范围、缺省值与可选覆盖解析                               |
 | `src/stores/resumes.ts`                      | 文档集合、活动 ID、统一修改动作、读取与保存状态                       |
@@ -57,7 +57,7 @@
 | `src/views/ResumeLibrary.vue`                | 多文档管理、时间排序、改名、备份导入导出                              |
 | `src/views/ResumeSettings.vue`               | 版式、字体、字号、配色；全部经 store 动作修改                         |
 | `src/styles.css`                             | 应用和画布基础样式，屏幕响应式及恢复提示                              |
-| `src/templates/resume-variants.css`          | 八种版式的布局差异                                                    |
+| `src/templates/resume-variants.css`          | 十四种版式的布局差异                                                  |
 | `src/templates/resume-print.css`             | A4 覆盖、自然分页、续页背景，必须最后加载                             |
 | `vite.config.ts`                             | Vue 编译插件与开发/构建配置                                           |
 | `tsconfig.json`                              | strict、未使用检查、DOM 类型；noEmit，打包由 Vite 完成                |
@@ -65,7 +65,7 @@
 | `eslint.config.js`                           | Vue/TypeScript 推荐规则，domain 依赖边界；Prettier 负责格式           |
 | `.prettierignore` / `.gitignore`             | 排除生成物及锁文件格式处理，不提供数据保存能力                        |
 | `.github/workflows/check.yml`                | Node 24 下运行 npm ci 与 check，未执行云端检查                        |
-| `docs/fixtures/*.json`                       | 三组固定 PDF 样本，每组覆盖八种版式，均为虚构信息                     |
+| `docs/fixtures/*.json`                       | 三组固定 PDF 样本，每组覆盖十四种版式，均为虚构信息                   |
 | `AGENTS.md` / `README.md`                    | 模块约束和使用方法                                                    |
 
 ## 3. 关键数据参数

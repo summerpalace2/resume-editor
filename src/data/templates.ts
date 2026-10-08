@@ -1,4 +1,4 @@
-/** @file 八种版式的共享登记表；选择界面、画布、缩略图和备份校验从此读取。 */
+/** @file 简历版式的共享登记表；选择界面、画布、缩略图和备份校验从此读取。 */
 import type { ResumeSection, ResumeTemplateId, SectionColumn } from '../types'
 
 /** 渲染结构与展示名称分离：不同版式可共用同一种结构。 */
@@ -23,7 +23,7 @@ export const layoutLabels: Record<ResumeLayout, string> = {
   sidebar: '信息侧栏',
 }
 
-/** 新版式应同时登记 ID、结构、页眉风格、缩略图样式与打印行为。 */
+/** 新版式应登记 ID、结构和页眉风格；共享画布样式也用于缩略图与打印。 */
 export const resumeTemplates: ResumeTemplateDefinition[] = [
   {
     id: 'two-column',
@@ -81,6 +81,49 @@ export const resumeTemplates: ResumeTemplateDefinition[] = [
     description: '经历在左，个人信息集中在右',
     layout: 'sidebar',
     header: 'solid',
+  },
+  {
+    id: 'ats-classic',
+    name: 'ATS 经典单栏',
+    description: '纯白背景和标准栏目标题，适合简洁清楚的在线投递',
+    layout: 'single',
+    header: 'light',
+  },
+  {
+    id: 'academic',
+    name: '学术履历',
+    description: '居中姓名与传统分隔线，适合教育和研究经历',
+    layout: 'single',
+    header: 'light',
+  },
+  {
+    id: 'modern-clean',
+    name: '现代清爽',
+    description: '轻量彩色页眉、横向个人信息与留白栏目',
+    layout: 'single',
+    header: 'solid',
+  },
+  {
+    id: 'portfolio',
+    name: '作品集双栏',
+    description: '技能与教育放在窄栏，项目和工作经历使用宽栏',
+    layout: 'columns',
+    header: 'light',
+    columnStrategy: 'qualifications-left',
+  },
+  {
+    id: 'compact',
+    name: '紧凑求职',
+    description: '缩短页眉与栏目间距，为较多经历留出空间',
+    layout: 'single',
+    header: 'solid',
+  },
+  {
+    id: 'creative-rail',
+    name: '创意侧线',
+    description: '左侧色线串联栏目，保留完整单栏阅读顺序',
+    layout: 'single',
+    header: 'light',
   },
 ]
 

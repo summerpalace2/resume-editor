@@ -714,6 +714,522 @@
           ]
         }
       ]
+    },
+    {
+      "id": "sample-photo-large-ats-classic",
+      "title": "photo-large · ats-classic",
+      "templateId": "ats-classic",
+      "profile": {
+        "name": "示例候选人",
+        "role": "软件工程师",
+        "github": "https://github.com/example",
+        "profileLines": [
+          "本科 · 软件工程",
+          "示例大学 · 2028 届"
+        ],
+        "phone": "13800000000",
+        "email": "candidate@example.com",
+        "location": "示例城市",
+        "summary": "",
+        "photo": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+a9XkAAAAASUVORK5CYII="
+      },
+      "appearance": {
+        "nameScale": 60,
+        "headingScale": 32,
+        "bodyScale": 24,
+        "font": "modern",
+        "accent": "forest",
+        "headerFontSizes": {
+          "role": 36,
+          "github": 28,
+          "email": 28,
+          "phone": 28,
+          "location": 28
+        },
+        "profileLineScales": [
+          28,
+          28
+        ]
+      },
+      "updatedAt": 1790985600000,
+      "sections": [
+        {
+          "id": "sample-work",
+          "kind": "work",
+          "title": "实践经历",
+          "visible": true,
+          "entries": [
+            {
+              "id": "sample-work-1",
+              "title": "示例团队 · 客户端开发",
+              "subtitle": "软件开发岗位",
+              "period": "2024.9 - 至今",
+              "description": "负责模块开发与维护。\n通过文档化、类型检查和错误处理提高可维护性。"
+            }
+          ]
+        },
+        {
+          "id": "sample-skills",
+          "kind": "skills",
+          "title": "个人能力",
+          "visible": true,
+          "entries": [
+            {
+              "id": "sample-skills-1",
+              "title": "",
+              "subtitle": "",
+              "period": "",
+              "description": "Java、Kotlin、TypeScript、Vue。\n列表符号由用户手动输入，不应自动生成。"
+            }
+          ]
+        },
+        {
+          "id": "sample-project",
+          "kind": "projects",
+          "title": "项目经历",
+          "visible": true,
+          "entries": [
+            {
+              "id": "sample-project-1",
+              "title": "示例项目 · 浏览器简历编辑器",
+              "subtitle": "Vue · TypeScript · IndexedDB",
+              "period": "2025.9 - 至今",
+              "link": "https://example.com/project",
+              "description": "支持多种布局、就地编辑与本地保存。\n使用相同样式定义进行预览和 PDF 导出。"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "sample-photo-large-academic",
+      "title": "photo-large · academic",
+      "templateId": "academic",
+      "profile": {
+        "name": "示例候选人",
+        "role": "软件工程师",
+        "github": "https://github.com/example",
+        "profileLines": [
+          "本科 · 软件工程",
+          "示例大学 · 2028 届"
+        ],
+        "phone": "13800000000",
+        "email": "candidate@example.com",
+        "location": "示例城市",
+        "summary": "",
+        "photo": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+a9XkAAAAASUVORK5CYII="
+      },
+      "appearance": {
+        "nameScale": 60,
+        "headingScale": 32,
+        "bodyScale": 24,
+        "font": "modern",
+        "accent": "forest",
+        "headerFontSizes": {
+          "role": 36,
+          "github": 28,
+          "email": 28,
+          "phone": 28,
+          "location": 28
+        },
+        "profileLineScales": [
+          28,
+          28
+        ]
+      },
+      "updatedAt": 1790985600000,
+      "sections": [
+        {
+          "id": "sample-work",
+          "kind": "work",
+          "title": "实践经历",
+          "visible": true,
+          "entries": [
+            {
+              "id": "sample-work-1",
+              "title": "示例团队 · 客户端开发",
+              "subtitle": "软件开发岗位",
+              "period": "2024.9 - 至今",
+              "description": "负责模块开发与维护。\n通过文档化、类型检查和错误处理提高可维护性。"
+            }
+          ]
+        },
+        {
+          "id": "sample-skills",
+          "kind": "skills",
+          "title": "个人能力",
+          "visible": true,
+          "entries": [
+            {
+              "id": "sample-skills-1",
+              "title": "",
+              "subtitle": "",
+              "period": "",
+              "description": "Java、Kotlin、TypeScript、Vue。\n列表符号由用户手动输入，不应自动生成。"
+            }
+          ]
+        },
+        {
+          "id": "sample-project",
+          "kind": "projects",
+          "title": "项目经历",
+          "visible": true,
+          "entries": [
+            {
+              "id": "sample-project-1",
+              "title": "示例项目 · 浏览器简历编辑器",
+              "subtitle": "Vue · TypeScript · IndexedDB",
+              "period": "2025.9 - 至今",
+              "link": "https://example.com/project",
+              "description": "支持多种布局、就地编辑与本地保存。\n使用相同样式定义进行预览和 PDF 导出。"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "sample-photo-large-modern-clean",
+      "title": "photo-large · modern-clean",
+      "templateId": "modern-clean",
+      "profile": {
+        "name": "示例候选人",
+        "role": "软件工程师",
+        "github": "https://github.com/example",
+        "profileLines": [
+          "本科 · 软件工程",
+          "示例大学 · 2028 届"
+        ],
+        "phone": "13800000000",
+        "email": "candidate@example.com",
+        "location": "示例城市",
+        "summary": "",
+        "photo": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+a9XkAAAAASUVORK5CYII="
+      },
+      "appearance": {
+        "nameScale": 60,
+        "headingScale": 32,
+        "bodyScale": 24,
+        "font": "modern",
+        "accent": "forest",
+        "headerFontSizes": {
+          "role": 36,
+          "github": 28,
+          "email": 28,
+          "phone": 28,
+          "location": 28
+        },
+        "profileLineScales": [
+          28,
+          28
+        ]
+      },
+      "updatedAt": 1790985600000,
+      "sections": [
+        {
+          "id": "sample-work",
+          "kind": "work",
+          "title": "实践经历",
+          "visible": true,
+          "entries": [
+            {
+              "id": "sample-work-1",
+              "title": "示例团队 · 客户端开发",
+              "subtitle": "软件开发岗位",
+              "period": "2024.9 - 至今",
+              "description": "负责模块开发与维护。\n通过文档化、类型检查和错误处理提高可维护性。"
+            }
+          ]
+        },
+        {
+          "id": "sample-skills",
+          "kind": "skills",
+          "title": "个人能力",
+          "visible": true,
+          "entries": [
+            {
+              "id": "sample-skills-1",
+              "title": "",
+              "subtitle": "",
+              "period": "",
+              "description": "Java、Kotlin、TypeScript、Vue。\n列表符号由用户手动输入，不应自动生成。"
+            }
+          ]
+        },
+        {
+          "id": "sample-project",
+          "kind": "projects",
+          "title": "项目经历",
+          "visible": true,
+          "entries": [
+            {
+              "id": "sample-project-1",
+              "title": "示例项目 · 浏览器简历编辑器",
+              "subtitle": "Vue · TypeScript · IndexedDB",
+              "period": "2025.9 - 至今",
+              "link": "https://example.com/project",
+              "description": "支持多种布局、就地编辑与本地保存。\n使用相同样式定义进行预览和 PDF 导出。"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "sample-photo-large-portfolio",
+      "title": "photo-large · portfolio",
+      "templateId": "portfolio",
+      "profile": {
+        "name": "示例候选人",
+        "role": "软件工程师",
+        "github": "https://github.com/example",
+        "profileLines": [
+          "本科 · 软件工程",
+          "示例大学 · 2028 届"
+        ],
+        "phone": "13800000000",
+        "email": "candidate@example.com",
+        "location": "示例城市",
+        "summary": "",
+        "photo": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+a9XkAAAAASUVORK5CYII="
+      },
+      "appearance": {
+        "nameScale": 60,
+        "headingScale": 32,
+        "bodyScale": 24,
+        "font": "modern",
+        "accent": "forest",
+        "headerFontSizes": {
+          "role": 36,
+          "github": 28,
+          "email": 28,
+          "phone": 28,
+          "location": 28
+        },
+        "profileLineScales": [
+          28,
+          28
+        ]
+      },
+      "updatedAt": 1790985600000,
+      "sections": [
+        {
+          "id": "sample-work",
+          "kind": "work",
+          "title": "实践经历",
+          "visible": true,
+          "entries": [
+            {
+              "id": "sample-work-1",
+              "title": "示例团队 · 客户端开发",
+              "subtitle": "软件开发岗位",
+              "period": "2024.9 - 至今",
+              "description": "负责模块开发与维护。\n通过文档化、类型检查和错误处理提高可维护性。"
+            }
+          ]
+        },
+        {
+          "id": "sample-skills",
+          "kind": "skills",
+          "title": "个人能力",
+          "visible": true,
+          "entries": [
+            {
+              "id": "sample-skills-1",
+              "title": "",
+              "subtitle": "",
+              "period": "",
+              "description": "Java、Kotlin、TypeScript、Vue。\n列表符号由用户手动输入，不应自动生成。"
+            }
+          ]
+        },
+        {
+          "id": "sample-project",
+          "kind": "projects",
+          "title": "项目经历",
+          "visible": true,
+          "entries": [
+            {
+              "id": "sample-project-1",
+              "title": "示例项目 · 浏览器简历编辑器",
+              "subtitle": "Vue · TypeScript · IndexedDB",
+              "period": "2025.9 - 至今",
+              "link": "https://example.com/project",
+              "description": "支持多种布局、就地编辑与本地保存。\n使用相同样式定义进行预览和 PDF 导出。"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "sample-photo-large-compact",
+      "title": "photo-large · compact",
+      "templateId": "compact",
+      "profile": {
+        "name": "示例候选人",
+        "role": "软件工程师",
+        "github": "https://github.com/example",
+        "profileLines": [
+          "本科 · 软件工程",
+          "示例大学 · 2028 届"
+        ],
+        "phone": "13800000000",
+        "email": "candidate@example.com",
+        "location": "示例城市",
+        "summary": "",
+        "photo": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+a9XkAAAAASUVORK5CYII="
+      },
+      "appearance": {
+        "nameScale": 60,
+        "headingScale": 32,
+        "bodyScale": 24,
+        "font": "modern",
+        "accent": "forest",
+        "headerFontSizes": {
+          "role": 36,
+          "github": 28,
+          "email": 28,
+          "phone": 28,
+          "location": 28
+        },
+        "profileLineScales": [
+          28,
+          28
+        ]
+      },
+      "updatedAt": 1790985600000,
+      "sections": [
+        {
+          "id": "sample-work",
+          "kind": "work",
+          "title": "实践经历",
+          "visible": true,
+          "entries": [
+            {
+              "id": "sample-work-1",
+              "title": "示例团队 · 客户端开发",
+              "subtitle": "软件开发岗位",
+              "period": "2024.9 - 至今",
+              "description": "负责模块开发与维护。\n通过文档化、类型检查和错误处理提高可维护性。"
+            }
+          ]
+        },
+        {
+          "id": "sample-skills",
+          "kind": "skills",
+          "title": "个人能力",
+          "visible": true,
+          "entries": [
+            {
+              "id": "sample-skills-1",
+              "title": "",
+              "subtitle": "",
+              "period": "",
+              "description": "Java、Kotlin、TypeScript、Vue。\n列表符号由用户手动输入，不应自动生成。"
+            }
+          ]
+        },
+        {
+          "id": "sample-project",
+          "kind": "projects",
+          "title": "项目经历",
+          "visible": true,
+          "entries": [
+            {
+              "id": "sample-project-1",
+              "title": "示例项目 · 浏览器简历编辑器",
+              "subtitle": "Vue · TypeScript · IndexedDB",
+              "period": "2025.9 - 至今",
+              "link": "https://example.com/project",
+              "description": "支持多种布局、就地编辑与本地保存。\n使用相同样式定义进行预览和 PDF 导出。"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "sample-photo-large-creative-rail",
+      "title": "photo-large · creative-rail",
+      "templateId": "creative-rail",
+      "profile": {
+        "name": "示例候选人",
+        "role": "软件工程师",
+        "github": "https://github.com/example",
+        "profileLines": [
+          "本科 · 软件工程",
+          "示例大学 · 2028 届"
+        ],
+        "phone": "13800000000",
+        "email": "candidate@example.com",
+        "location": "示例城市",
+        "summary": "",
+        "photo": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+a9XkAAAAASUVORK5CYII="
+      },
+      "appearance": {
+        "nameScale": 60,
+        "headingScale": 32,
+        "bodyScale": 24,
+        "font": "modern",
+        "accent": "forest",
+        "headerFontSizes": {
+          "role": 36,
+          "github": 28,
+          "email": 28,
+          "phone": 28,
+          "location": 28
+        },
+        "profileLineScales": [
+          28,
+          28
+        ]
+      },
+      "updatedAt": 1790985600000,
+      "sections": [
+        {
+          "id": "sample-work",
+          "kind": "work",
+          "title": "实践经历",
+          "visible": true,
+          "entries": [
+            {
+              "id": "sample-work-1",
+              "title": "示例团队 · 客户端开发",
+              "subtitle": "软件开发岗位",
+              "period": "2024.9 - 至今",
+              "description": "负责模块开发与维护。\n通过文档化、类型检查和错误处理提高可维护性。"
+            }
+          ]
+        },
+        {
+          "id": "sample-skills",
+          "kind": "skills",
+          "title": "个人能力",
+          "visible": true,
+          "entries": [
+            {
+              "id": "sample-skills-1",
+              "title": "",
+              "subtitle": "",
+              "period": "",
+              "description": "Java、Kotlin、TypeScript、Vue。\n列表符号由用户手动输入，不应自动生成。"
+            }
+          ]
+        },
+        {
+          "id": "sample-project",
+          "kind": "projects",
+          "title": "项目经历",
+          "visible": true,
+          "entries": [
+            {
+              "id": "sample-project-1",
+              "title": "示例项目 · 浏览器简历编辑器",
+              "subtitle": "Vue · TypeScript · IndexedDB",
+              "period": "2025.9 - 至今",
+              "link": "https://example.com/project",
+              "description": "支持多种布局、就地编辑与本地保存。\n使用相同样式定义进行预览和 PDF 导出。"
+            }
+          ]
+        }
+      ]
     }
   ]
 }
