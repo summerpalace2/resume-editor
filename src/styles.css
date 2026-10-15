@@ -1512,9 +1512,6 @@ a {
   .toolbar-actions {
     gap: 8px;
   }
-  .toolbar-actions .toolbar-link {
-    display: none;
-  }
   .resume-stage {
     justify-content: center;
     overflow-x: visible;
@@ -1525,7 +1522,12 @@ a {
     gap: 20px;
   }
   .settings-preview-wrap {
-    display: none;
+    position: static;
+    display: block;
+    grid-row: 1;
+  }
+  .settings-content {
+    grid-row: 2;
   }
 }
 
@@ -1610,6 +1612,11 @@ a {
 }
 
 @media screen and (max-width: 650px) {
+  .brand,
+  .back-link {
+    min-height: 44px;
+    align-items: center;
+  }
   .app-toolbar {
     height: auto;
     min-height: 64px;
@@ -1623,11 +1630,52 @@ a {
   }
   .toolbar-actions {
     width: 100%;
-    justify-content: flex-end;
+    justify-content: stretch;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .toolbar-actions > * {
+    display: inline-flex;
+    flex: 1 1 calc(50% - 8px);
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    text-align: center;
+  }
+  .toolbar-actions .toolbar-link {
+    border: 1px solid #dfe4ea;
+    border-radius: 8px;
+    padding: 8px;
+    background: #fff;
   }
   .workspace-hint {
-    padding: 0 12px;
-    text-align: center;
+    min-height: 48px;
+    justify-content: flex-start;
+    padding: 8px 14px;
+    line-height: 1.5;
+    text-align: left;
+  }
+  .preview-controls {
+    position: static;
+    justify-content: flex-start;
+    gap: 6px;
+    padding: 8px 12px;
+  }
+  .preview-controls > span {
+    flex-basis: 100%;
+  }
+  .preview-controls button {
+    min-width: 44px;
+    min-height: 44px;
+    padding-inline: 10px;
+  }
+  .preview-controls input {
+    flex: 1 1 90px;
+    min-width: 80px;
+    height: 44px;
+  }
+  .preview-controls output {
+    min-width: 42px;
   }
   .library-content,
   .settings-layout {
@@ -1641,6 +1689,14 @@ a {
   .backup-bar {
     align-items: flex-start;
     flex-direction: column;
+  }
+  .backup-actions {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+  .backup-actions .button {
+    flex: 1 1 140px;
+    min-height: 44px;
   }
   .resume-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1660,7 +1716,180 @@ a {
   .library-header {
     padding-inline: 16px;
   }
+  .settings-preview-wrap {
+    min-width: 0;
+  }
+  .settings-resume-preview {
+    height: clamp(300px, 48svh, 540px);
+    padding: 8px;
+  }
+  .preview-controls--compact {
+    gap: 6px;
+    padding: 8px 0 10px;
+  }
+  .preview-controls--compact input {
+    width: auto;
+  }
+  .preview-note {
+    margin-top: 8px;
+    line-height: 1.5;
+  }
+  .setting-card {
+    margin-top: 16px;
+    padding: 16px;
+  }
+  .setting-heading {
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 14px;
+  }
+  .font-options {
+    grid-template-columns: 1fr;
+  }
+  .color-options {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+  .font-option,
+  .color-option {
+    min-height: 76px;
+  }
+  .template-filters button {
+    min-height: 40px;
+    padding-inline: 12px;
+  }
+  .range-setting input {
+    min-height: 44px;
+  }
+  .link-address-input,
+  .entry-link-input {
+    min-height: 44px;
+    padding-block: 8px;
+  }
+  .text-format-toolbar--floating {
+    max-height: calc(100dvh - 24px);
+    padding: 8px;
+  }
+  .text-format-toolbar--floating button,
+  .text-format-toolbar--floating .text-custom-color {
+    min-height: 44px;
+    padding: 8px 10px;
+  }
+  .text-format-toolbar--floating .text-format-label {
+    min-height: 36px;
+    display: inline-flex;
+    align-items: center;
+  }
+  .text-format-toolbar .text-color-swatch {
+    width: 36px;
+    height: 36px;
+    min-height: 36px;
+  }
+  .text-color-group {
+    grid-template-columns: 1fr;
+    gap: 4px;
+  }
+  .text-color-group > div {
+    grid-template-columns: repeat(4, 36px);
+    gap: 8px;
+  }
+  .text-color-code-controls input,
+  .text-color-code-controls button {
+    min-height: 44px;
+  }
+  .card-menu button {
+    min-width: 44px;
+    min-height: 44px;
+  }
+  .section-tools button,
+  .entry-tools button {
+    min-height: 40px;
+    padding: 8px 10px;
+  }
+  .add-entry,
+  .add-section {
+    min-height: 44px;
+  }
 }
+
+@media screen and (max-width: 430px) {
+  .resume-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .resume-card-preview {
+    height: 220px;
+  }
+  .settings-layout {
+    width: calc(100% - 24px);
+  }
+  .settings-content h1,
+  .library-title-row h1 {
+    font-size: 26px;
+  }
+}
+
+/* 手机查看使用缩放后的固定 A4 画布；断点只改变外围控件，不重排简历本身。 */
+@media screen and (max-width: 1024px) {
+  .preview-zoom-frame .resume-page {
+    width: 1024px;
+    min-height: 1448px;
+    border-radius: 5px;
+    box-shadow: 0 0 15px #c0c0c0;
+  }
+  .preview-zoom-frame .resume-main {
+    min-height: 1135px;
+    padding: 30px 32px 0;
+    border-right: 1px solid color-mix(in srgb, var(--accent) 15%, transparent);
+    column-count: 2;
+  }
+  .preview-zoom-frame .resume-page.structure-sidebar {
+    display: grid;
+  }
+  .preview-zoom-frame .resume-page.structure-sidebar .resume-masthead,
+  .preview-zoom-frame .resume-page.structure-sidebar .resume-main {
+    min-height: 1448px;
+  }
+}
+
+@media screen and (max-width: 720px) {
+  .preview-zoom-frame .resume-masthead {
+    padding: 25px 36px;
+    text-align: left;
+  }
+  .preview-zoom-frame .masthead-top,
+  .preview-zoom-frame .masthead-bottom {
+    align-items: flex-start;
+    flex-direction: row;
+    text-align: left;
+  }
+  .preview-zoom-frame .masthead-top {
+    gap: 20px;
+  }
+  .preview-zoom-frame .masthead-identity {
+    flex-direction: row;
+  }
+  .preview-zoom-frame .resume-name,
+  .preview-zoom-frame .resume-role,
+  .preview-zoom-frame .profile-lines,
+  .preview-zoom-frame .profile-line,
+  .preview-zoom-frame .masthead-contacts,
+  .preview-zoom-frame .masthead-contact {
+    text-align: left;
+  }
+  .preview-zoom-frame .resume-role {
+    margin-top: 20px;
+  }
+  .preview-zoom-frame .masthead-contacts {
+    align-items: flex-end;
+  }
+  .preview-zoom-frame .masthead-photo {
+    position: absolute;
+    width: 242px;
+    height: 242px;
+    margin: 0;
+  }
+}
+
 /* 数据恢复与保存错误提示跨页面保留，打印时由 no-print 规则隐藏。 */
 .storage-notice {
   display: flex;
@@ -1705,5 +1934,87 @@ a {
   .settings-resume-preview .resume-page {
     /* 查看比例由外层统一处理，移除原来固定的缩略图倍率，避免叠加缩放。 */
     zoom: 1;
+  }
+}
+
+@media screen and (max-width: 720px), screen and (pointer: coarse) and (max-width: 900px) {
+  .text-format-toolbar--floating {
+    right: 12px;
+    width: auto;
+    max-width: none;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: stretch;
+    gap: 8px;
+    padding: 10px;
+    border-radius: 14px;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+  .text-format-toolbar--floating .text-format-label,
+  .text-format-toolbar--floating .text-color-panel {
+    grid-column: 1 / -1;
+  }
+  .text-format-toolbar--floating .text-format-label {
+    min-height: 28px;
+    display: flex;
+    align-items: center;
+    padding: 0 0 6px;
+    border-right: 0;
+    border-bottom: 1px solid #d6e0eb;
+  }
+  .text-format-toolbar--floating button,
+  .text-format-toolbar--floating .text-custom-color {
+    width: 100%;
+    min-width: 0;
+    min-height: 46px;
+    justify-content: center;
+    padding: 9px 8px;
+    border-radius: 8px;
+    touch-action: manipulation;
+  }
+  .text-format-toolbar--floating .text-custom-color {
+    border: 1px solid #cbd5e1;
+    background: #fff;
+    gap: 8px;
+  }
+  .text-format-toolbar--floating .text-custom-color input {
+    width: 32px;
+    height: 32px;
+  }
+  .text-format-toolbar--floating .text-color-panel {
+    max-height: min(34dvh, 260px);
+    overflow-y: auto;
+    padding-top: 8px;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+  .text-format-toolbar--floating .text-color-group {
+    grid-template-columns: 1fr;
+    gap: 5px;
+  }
+  .text-format-toolbar--floating .text-color-group > div {
+    grid-template-columns: repeat(5, minmax(36px, 1fr));
+    gap: 8px;
+  }
+  .text-format-toolbar--floating .text-color-swatch {
+    width: 100%;
+    height: 40px;
+    min-height: 40px;
+    border-radius: 8px;
+  }
+  .text-format-toolbar--floating .text-color-code-controls {
+    align-items: stretch;
+  }
+  .text-format-toolbar--floating .text-color-code-controls label {
+    flex: 1 1 100%;
+    justify-content: space-between;
+  }
+  .text-format-toolbar--floating .text-color-code-controls input {
+    width: min(55vw, 190px);
+    min-height: 44px;
+  }
+  .text-format-toolbar--floating .text-color-code-controls button {
+    flex: 1 1 calc(50% - 8px);
   }
 }

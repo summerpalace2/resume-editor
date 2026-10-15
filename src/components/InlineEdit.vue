@@ -104,6 +104,34 @@ watch(
   },
 )
 
+/** 手机长按会先选中展示层 DOM；选区需映射到富文本编辑器才可显示格式栏。 */
+function hasDisplayTextSelection(): boolean {
+  const selected = window.getSelection()
+  return Boolean(
+    selected &&
+      !selected.isCollapsed &&
+      selected.toString().length > 0 &&
+      display.value &&
+      selected.anchorNode &&
+      selected.focusNode &&
+      display.value.contains(selected.anchorNode) &&
+      display.value.contains(selected.focusNode),
+  )
+}
+
+function handleDisplayContextMenu(event: MouseEvent): void {
+  if (
+    !props.editing ||
+    isEditing.value ||
+    !window.matchMedia('(pointer: coarse)').matches ||
+    !hasDisplayTextSelection()
+  )
+    return
+  // 使用自有格式工具栏替代展示层的“复制”浮层，并将原选区交给编辑器。
+  event.preventDefault()
+  void begin(event)
+}
+
 /** 拖选展示文字后转入富文本编辑，保留同一选区；不另外展开预览。 */
 async function begin(event?: MouseEvent): Promise<void> {
   if (!props.editing || isEditing.value) return
@@ -158,24 +186,38 @@ async function positionToolbar(event?: Event): Promise<void> {
   const anchorTop = pointer ? event.clientY : rect.top
   await nextTick()
   if (!toolbar.value || !isEditing.value || !hasSelection.value) return
-  const bounds = toolbar.value.getBoundingClientRect()
   const viewport = window.visualViewport
+  const compact = window.matchMedia(
+    '(max-width: 720px), (pointer: coarse) and (max-width: 900px)',
+  ).matches
+  if (compact) {
+    const viewportHeight = viewport?.height ?? window.innerHeight
+    toolbar.value.style.maxHeight = `${Math.max(108, Math.floor((viewportHeight - 32) * 0.54))}px`
+  } else {
+    toolbar.value.style.removeProperty('max-height')
+  }
+  const bounds = toolbar.value.getBoundingClientRect()
   const minLeft = (viewport?.offsetLeft ?? 0) + 12
   const minTop = (viewport?.offsetTop ?? 0) + 12
   const right = (viewport?.offsetLeft ?? 0) + (viewport?.width ?? window.innerWidth) - 12
   const bottom =
     (viewport?.offsetTop ?? 0) + (viewport?.height ?? window.innerHeight) - 12
   toolbarPosition.value = {
-    left: Math.max(minLeft, Math.min(anchorX - bounds.width / 2, right - bounds.width)),
-    top: Math.max(
-      minTop,
-      Math.min(
-        anchorY + 12 + bounds.height <= bottom
-          ? anchorY + 12
-          : anchorTop - bounds.height - 12,
-        bottom - bounds.height,
-      ),
-    ),
+    // 手机工具栏停在可视区域底部（软键盘上沿），不盖住选中的文字。
+    left: compact
+      ? minLeft
+      : Math.max(minLeft, Math.min(anchorX - bounds.width / 2, right - bounds.width)),
+    top: compact
+      ? Math.max(minTop, bottom - bounds.height - 8)
+      : Math.max(
+          minTop,
+          Math.min(
+            anchorY + 12 + bounds.height <= bottom
+              ? anchorY + 12
+              : anchorTop - bounds.height - 12,
+            bottom - bounds.height,
+          ),
+        ),
   }
 }
 
@@ -320,6 +362,7 @@ onUnmounted(() => {
     :tabindex="isEditing ? -1 : undefined"
     @focusout="onFocusOut"
     @click.stop="begin"
+    @contextmenu="handleDisplayContextMenu"
   >
     <template v-if="!isEditing || !editorReady">
       <FormattedText
@@ -373,7 +416,7 @@ onUnmounted(() => {
         type="button"
         :aria-pressed="allBulleted"
         title="给选中段落添加或取消圆点，保留空行"
-        @mousedown.prevent
+        @pointerdown.prevent
         @click="toggleList"
       >
         • 无序列表
@@ -383,7 +426,7 @@ onUnmounted(() => {
         :disabled="!hasSelection"
         :aria-pressed="allBold"
         title="加粗（Ctrl / Cmd + B）"
-        @mousedown.prevent
+        @pointerdown.prevent
         @click="applyFormat({ bold: !allBold })"
       >
         <b>B</b> 加粗
@@ -392,7 +435,7 @@ onUnmounted(() => {
         type="button"
         class="text-color-toggle"
         :aria-expanded="colorPanelOpen"
-        @mousedown.prevent
+        @pointerdown.prevent
         @click="colorPanelOpen = !colorPanelOpen"
       >
         <i :style="{ backgroundColor: selectionColor }" aria-hidden="true"></i>文字颜色
@@ -411,12 +454,12 @@ onUnmounted(() => {
       <button
         type="button"
         :disabled="!hasSelection"
-        @mousedown.prevent
+        @pointerdown.prevent
         @click="applyFormat({ clear: true })"
       >
         清除格式
       </button>
-      <button type="button" @mousedown.prevent @click="commit">完成</button>
+      <button type="button" @pointerdown.prevent @click="commit">完成</button>
       <div
         v-if="colorPanelOpen"
         class="text-color-panel"
@@ -435,7 +478,7 @@ onUnmounted(() => {
               :aria-label="`${color.name} ${color.value}`"
               :title="`${color.name} ${color.value}`"
               :aria-pressed="colorIsSelected(color.value)"
-              @mousedown.prevent
+              @pointerdown.prevent
               @click="applyFormat({ color: color.value })"
             />
           </div>
@@ -453,10 +496,10 @@ onUnmounted(() => {
               @input="colorCodeError = ''"
               @keydown.enter.prevent="applyColorCode"
           /></label>
-          <button type="button" @mousedown.prevent @click="applyColorCode">应用</button>
+          <button type="button" @pointerdown.prevent @click="applyColorCode">应用</button>
           <button
             type="button"
-            @mousedown.prevent
+            @pointerdown.prevent
             @click="applyFormat({ resetColor: true })"
           >
             默认颜色
