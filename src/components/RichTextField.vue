@@ -261,14 +261,15 @@ onMounted(async () => {
   })
   // 旧 CRLF 段落规范成编辑内核的 LF 后，同步文字和对应的新区间。
   publishDraft()
-  await nextTick()
-  if (!editor.value || editor.value.isDestroyed) return
-  // EditorContent 已挂载后才撤下原文字；等父组件完成交接再恢复焦点和选区。
+  // 在用户点击的同步生命周期内立刻交出焦点，确保手机浏览器首次轻触即可弹出输入法。
   emit('ready')
-  await nextTick()
-  if (!editor.value || editor.value.isDestroyed) return
   restoreSelection(props.initialSelection, props.initialViewport)
   publishSelection()
+  await nextTick()
+  if (!editor.value || editor.value.isDestroyed) return
+  if (document.activeElement !== editor.value.view.dom) {
+    restoreSelection(props.initialSelection, props.initialViewport)
+  }
 })
 
 onUnmounted(() => {

@@ -1,5 +1,9 @@
 /** @file 页面离开前的草稿提交协议；存储和模板无需互相持有组件引用。 */
+import type { InjectionKey } from 'vue'
+
 export const COMMIT_EDITS_EVENT = 'resume-studio:commit-edits'
+export const DIRECT_EDIT_REQUEST_KEY: InjectionKey<() => void> =
+  Symbol('direct-edit-request')
 
 /** 同步通知活动编辑框；DOM 更新前文档副本已通过事件提交给工作区。 */
 export function commitActiveEdits(): void {

@@ -1,12 +1,22 @@
 <script setup lang="ts">
 /** @file 编辑工作区页面：连接 store 与画布，管理编辑模式、保存提示和 PDF 导出。 */
-import { nextTick, ref, useTemplateRef, watch } from 'vue'
+import {
+  computed,
+  nextTick,
+  onMounted,
+  onUnmounted,
+  provide,
+  ref,
+  useTemplateRef,
+  watch,
+} from 'vue'
 import { useRouter } from 'vue-router'
 import PdfImportDialog from '../components/PdfImportDialog.vue'
 import ResumePreview from '../components/ResumePreview.vue'
 import PreviewZoomControls from '../components/PreviewZoomControls.vue'
 import { usePdfImport } from '../composables/usePdfImport'
 import { usePreviewZoom } from '../composables/usePreviewZoom'
+import { DIRECT_EDIT_REQUEST_KEY } from '../services/editLifecycle'
 import { useResumeStore } from '../stores/resumes'
 import type { ResumeDocument } from '../types'
 
@@ -20,6 +30,32 @@ const { parsingPdf, pendingPdf, parsePdfFile, clearPendingPdf } = usePdfImport()
 const editing = ref(false)
 /** 导出准备期间阻止重复触发，打印窗口结束后释放。 */
 const preparingPdf = ref(false)
+const isMobileViewport = ref(false)
+const mobileA4Preview = ref(false)
+const useMobileResponsive = computed(
+  () => isMobileViewport.value && !mobileA4Preview.value,
+)
+
+provide(DIRECT_EDIT_REQUEST_KEY, () => {
+  editing.value = true
+})
+
+let mobileMediaQuery: MediaQueryList | null = null
+function syncMobileViewport(): void {
+  if (!mobileMediaQuery) return
+  isMobileViewport.value = mobileMediaQuery.matches
+  if (!mobileMediaQuery.matches) mobileA4Preview.value = false
+}
+
+onMounted(() => {
+  mobileMediaQuery = window.matchMedia('(max-width: 768px)')
+  syncMobileViewport()
+  mobileMediaQuery.addEventListener('change', syncMobileViewport)
+})
+
+onUnmounted(() => {
+  mobileMediaQuery?.removeEventListener('change', syncMobileViewport)
+})
 
 /** 完成编辑时提交草稿并等待保存；失败提示由跨页面恢复条保留。 */
 async function toggleEditing(): Promise<void> {
@@ -162,22 +198,41 @@ function confirmWorkspacePdfImport(payload: {
         点击简历中的文字即可修改，修改会自动保存到当前浏览器。</span
       >
       <span v-else
-        >点击“编辑简历”即可修改内容。简历数据仅保存在当前浏览器，不会上传服务器。</span
+        >轻触简历文字或点击“编辑简历”即可修改内容，数据仅保存在当前浏览器。</span
       >
       <button v-if="editing" class="hint-close" @click="toggleEditing">完成</button>
     </div>
 
+    <div v-if="useMobileResponsive" class="mobile-preview-bar no-print">
+      <span>当前为手机适配视图（支持直接点击文字修改）</span>
+      <button type="button" class="button button-quiet" @click="mobileA4Preview = true">
+        查看 A4 原比例
+      </button>
+    </div>
+
     <PreviewZoomControls
+      v-else
       :percent="zoomPercent"
       :fit-width="fitWidth"
       :min="minZoom"
       :max="maxZoom"
       @change="setZoom"
       @fit="fitWidth = true"
-    />
+    >
+      <button v-if="isMobileViewport" type="button" @click="mobileA4Preview = false">
+        手机适配视图
+      </button>
+    </PreviewZoomControls>
 
-    <section ref="stage" class="resume-stage resume-stage--zoomable">
-      <div class="preview-zoom-frame" :style="{ '--preview-zoom': zoomPercent / 100 }">
+    <section
+      ref="stage"
+      class="resume-stage"
+      :class="useMobileResponsive ? 'resume-stage--mobile' : 'resume-stage--zoomable'"
+    >
+      <div
+        :class="useMobileResponsive ? 'resume-mobile-frame' : 'preview-zoom-frame'"
+        :style="useMobileResponsive ? undefined : { '--preview-zoom': zoomPercent / 100 }"
+      >
         <ResumePreview
           :resume="store.activeResume"
           :editing="editing"

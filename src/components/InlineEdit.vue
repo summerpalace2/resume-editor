@@ -2,7 +2,7 @@
 /** @file 单字段编辑及选区格式；文字与格式以一次事件原子提交，避免副本互相覆盖。 */
 import {
   computed,
-  defineAsyncComponent,
+  inject,
   ref,
   shallowRef,
   watch,
@@ -10,17 +10,15 @@ import {
   onMounted,
   onUnmounted,
 } from 'vue'
-import { COMMIT_EDITS_EVENT } from '../services/editLifecycle'
+import { COMMIT_EDITS_EVENT, DIRECT_EDIT_REQUEST_KEY } from '../services/editLifecycle'
 import { captureEditorViewport, type ScrollSnapshot } from '../services/editorViewport'
 import { rebaseFormats, textSegments } from '../domain/textFormatting'
 import { hasUnorderedList } from '../domain/textLists'
 import { textColorGroups } from '../data/textColors'
 import FormattedText from './FormattedText.vue'
+import RichTextField from './RichTextField.vue'
 import type { TextFormatRange } from '../types'
-import type RichTextFieldComponent from './RichTextField.vue'
 import type { TextSelection } from '../services/richTextDocument'
-
-const RichTextField = defineAsyncComponent(() => import('./RichTextField.vue'))
 
 // 工具栏 Teleport 后存在多个根节点，显式把字段字号/类名绑定到字段本身。
 defineOptions({ inheritAttrs: false })
@@ -45,10 +43,9 @@ const props = withDefaults(
 )
 const emit = defineEmits<{ commit: [value: string, formats: TextFormatRange[]] }>()
 const isEditing = ref(false)
-const editorReady = ref(false)
 const draft = ref(props.modelValue)
 const draftFormats = ref<TextFormatRange[]>([])
-const field = ref<InstanceType<typeof RichTextFieldComponent> | null>(null)
+const field = ref<InstanceType<typeof RichTextField> | null>(null)
 const display = ref<HTMLElement | null>(null)
 const toolbar = ref<HTMLElement | null>(null)
 const toolbarPosition = ref({ left: 12, top: 12 })
@@ -61,6 +58,7 @@ const colorDialogActive = ref(false)
 const colorPanelOpen = ref(false)
 const colorCode = ref('')
 const colorCodeError = ref('')
+const requestDirectEdit = inject(DIRECT_EDIT_REQUEST_KEY, null)
 const hasSelection = computed(
   () => selection.value.end > selection.value.start && !composing.value,
 )
@@ -135,9 +133,41 @@ function handleDisplayContextMenu(event: MouseEvent): void {
   void begin(event)
 }
 
-/** 拖选展示文字后转入富文本编辑，保留同一选区；不另外展开预览。 */
-async function begin(event?: MouseEvent): Promise<void> {
-  if (!props.editing || isEditing.value) return
+function resolveDisplayOffset(node: Node, offset: number): number {
+  if (!display.value) return 0
+  const prefix = document.createRange()
+  prefix.selectNodeContents(display.value)
+  prefix.setEnd(node, offset)
+  return prefix.toString().length
+}
+
+function caretRangeFromClick(event?: MouseEvent): Range | null {
+  if (!event || !display.value) return null
+  const doc = document as Document & {
+    caretPositionFromPoint?: (
+      x: number,
+      y: number,
+    ) => { offsetNode: Node; offset: number } | null
+  }
+  if (typeof doc.caretPositionFromPoint === 'function') {
+    const pos = doc.caretPositionFromPoint(event.clientX, event.clientY)
+    if (pos && display.value.contains(pos.offsetNode)) {
+      const range = document.createRange()
+      range.setStart(pos.offsetNode, pos.offset)
+      range.collapse(true)
+      return range
+    }
+  }
+  if (typeof document.caretRangeFromPoint === 'function') {
+    const range = document.caretRangeFromPoint(event.clientX, event.clientY)
+    if (range && display.value.contains(range.startContainer)) return range
+  }
+  return null
+}
+
+/** 拖选或轻触展示文字后转入富文本编辑，保留选区或点击光标；不另外展开预览。 */
+async function begin(event?: MouseEvent, allowWithoutEditProp = false): Promise<void> {
+  if ((!props.editing && !allowWithoutEditProp) || isEditing.value) return
   initialViewport.value = display.value ? captureEditorViewport(display.value) : null
   let start = 0
   let end = 0
@@ -148,16 +178,18 @@ async function begin(event?: MouseEvent): Promise<void> {
       display.value.contains(range.startContainer) &&
       display.value.contains(range.endContainer)
     ) {
-      const prefix = range.cloneRange()
-      prefix.selectNodeContents(display.value)
-      prefix.setEnd(range.startContainer, range.startOffset)
-      start = prefix.toString().length
+      start = resolveDisplayOffset(range.startContainer, range.startOffset)
       end = start + range.toString().length
+    }
+  } else if (props.modelValue) {
+    const tapRange = caretRangeFromClick(event)
+    if (tapRange) {
+      start = resolveDisplayOffset(tapRange.startContainer, tapRange.startOffset)
+      end = start
     }
   }
   draft.value = props.modelValue
   draftFormats.value = (props.formats ?? []).map((range) => ({ ...range }))
-  editorReady.value = false
   isEditing.value = true
   composing.value = false
   selection.value = { start: 0, end: 0 }
@@ -171,6 +203,21 @@ async function begin(event?: MouseEvent): Promise<void> {
   await nextTick()
   // 加载期间原文字继续占位；仅在编辑内核就绪后交出焦点，避免两次聚焦跳动。
   if (event) void positionToolbar(event)
+}
+
+function handleDisplayClick(event: MouseEvent): void {
+  if (props.editing) {
+    event.stopPropagation()
+    void begin(event)
+    return
+  }
+  if (!requestDirectEdit) return
+  const selected = window.getSelection()
+  // 允许先拖选复制文本；仅在直接轻触/点击文字时自动进入编辑。
+  if (selected && !selected.isCollapsed && selected.toString().length > 0) return
+  event.stopPropagation()
+  requestDirectEdit()
+  void begin(event, true)
 }
 
 /** 子组件将编辑内核位置映射成纯文本选区；工具栏只使用这一契约。 */
@@ -367,13 +414,14 @@ onUnmounted(() => {
     :class="{
       'inline-editable': editing && !isEditing,
       'inline-edit-host': isEditing,
+      'inline-direct-tap': !editing && Boolean(requestDirectEdit),
     }"
     :tabindex="isEditing ? -1 : undefined"
     @focusout="onFocusOut"
-    @click.stop="begin"
+    @click="handleDisplayClick"
     @contextmenu="handleDisplayContextMenu"
   >
-    <template v-if="!isEditing || !editorReady">
+    <template v-if="!isEditing">
       <FormattedText
         v-if="modelValue"
         :text="modelValue"
@@ -382,11 +430,7 @@ onUnmounted(() => {
       />
       <span v-else-if="editing" class="empty-hint">{{ placeholder }}</span>
     </template>
-    <span
-      v-if="isEditing"
-      class="inline-editor"
-      :class="{ 'inline-editor--loading': !editorReady }"
-    >
+    <span v-else class="inline-editor">
       <RichTextField
         ref="field"
         :text="draft"
@@ -395,7 +439,6 @@ onUnmounted(() => {
         :placeholder="placeholder"
         :initial-selection="initialSelection"
         :initial-viewport="initialViewport"
-        @ready="editorReady = true"
         @change="updateDraft"
         @selection="rememberSelection"
         @complete="commit"

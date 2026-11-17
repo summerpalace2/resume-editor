@@ -711,6 +711,64 @@
 .resume-card-preview .template-thumbnail {
   box-shadow: 0 5px 15px rgb(27 41 60 / 18%);
 }
+@media screen and (max-width: 768px) {
+  .resume-mobile-frame .resume-page.light-header.has-photo .masthead-top,
+  .resume-mobile-frame .resume-page.light-header.has-photo .masthead-bottom {
+    margin-right: 0;
+  }
+  .resume-mobile-frame .resume-page.light-header .masthead-photo {
+    position: relative;
+    top: auto;
+    right: auto;
+    left: auto;
+  }
+  .resume-mobile-frame .resume-page.layout-bento-grid .resume-masthead {
+    min-height: 0;
+    margin: 12px 12px 0;
+    padding: 18px 16px;
+  }
+  .resume-mobile-frame .resume-page.layout-bento-grid .resume-main {
+    padding: 12px 12px 24px;
+  }
+  .resume-mobile-frame .resume-page.layout-bento-grid .resume-section {
+    margin-bottom: 12px;
+    padding: 14px;
+  }
+  .resume-mobile-frame .resume-page.layout-swiss-grid .resume-masthead,
+  .resume-mobile-frame .resume-page.layout-dev-spec .resume-masthead,
+  .resume-mobile-frame .resume-page.layout-hero-timeline .resume-masthead,
+  .resume-mobile-frame .resume-page.layout-magazine-editorial .resume-masthead,
+  .resume-mobile-frame .resume-page.layout-portfolio .resume-masthead,
+  .resume-mobile-frame .resume-page.layout-creative-rail .resume-masthead {
+    min-height: 0;
+    padding: 20px 16px;
+  }
+  .resume-mobile-frame .resume-page.layout-swiss-grid .resume-main,
+  .resume-mobile-frame .resume-page.layout-dev-spec .resume-main,
+  .resume-mobile-frame .resume-page.layout-hero-timeline .resume-main,
+  .resume-mobile-frame .resume-page.layout-magazine-editorial .resume-main,
+  .resume-mobile-frame .resume-page.layout-portfolio .resume-main {
+    padding: 18px 16px 28px;
+  }
+  .resume-mobile-frame .resume-page.layout-creative-rail .resume-main {
+    padding: 18px 16px 28px 28px;
+  }
+  .resume-mobile-frame .resume-page.layout-creative-rail .resume-section::before {
+    left: -12px;
+  }
+  .resume-mobile-frame .resume-page.layout-swiss-grid .resume-section {
+    grid-template-columns: 1fr;
+    row-gap: 6px;
+  }
+  .resume-mobile-frame .resume-page.layout-hero-timeline .entry-list {
+    margin-left: 4px;
+    padding-left: 16px;
+  }
+  .resume-mobile-frame .resume-page.layout-hero-timeline .resume-entry::before {
+    left: -24px;
+  }
+}
+
 @media screen and (max-width: 650px) {
   .template-options {
     grid-template-columns: 1fr;
