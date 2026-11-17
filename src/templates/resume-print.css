@@ -131,6 +131,34 @@
     orphans: 3;
     widows: 3;
   }
+  .resume-page.layout-bento-grid {
+    background: #f6f8fb;
+  }
+  .resume-page.layout-bento-grid .resume-masthead {
+    margin: 18px 26px 0;
+    border-radius: 12px;
+    box-shadow: none;
+  }
+  .resume-page.layout-bento-grid .resume-section {
+    border-radius: 10px;
+    box-shadow: none;
+    -webkit-box-decoration-break: clone;
+    box-decoration-break: clone;
+  }
+  .resume-page.layout-swiss-grid .resume-section {
+    display: grid;
+    grid-template-columns: 205px minmax(0, 1fr);
+    column-gap: 28px;
+  }
+  .resume-page.layout-magazine-editorial .resume-column-left {
+    border-radius: 8px;
+  }
+  .resume-page.layout-hero-timeline .entry-list {
+    display: block;
+  }
+  .resume-page.layout-hero-timeline .resume-entry + .resume-entry {
+    margin-top: 10px;
+  }
   .inline-editable {
     outline: 0 !important;
   }

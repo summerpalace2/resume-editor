@@ -1,6 +1,11 @@
 /** @file 将文档外观编排为响应式 CSS 变量；字体就绪后重新测量侧栏。 */
 import { computed, ref, onMounted, onUnmounted } from 'vue'
-import { headerFontSize, profileLineFontSize, paragraphSpacing } from '../data/typography'
+import {
+  headerFontSize,
+  letterSpacing,
+  paragraphSpacing,
+  profileLineFontSize,
+} from '../data/typography'
 import { getResumePalette } from '../data/palettes'
 import { isSidebarTemplate } from '../data/templates'
 import { githubLabel } from '../domain/links'
@@ -22,6 +27,10 @@ export function useResumeStyle(resume: () => ResumeDocument) {
     modern: '"Museo Sans", Arial, "Microsoft YaHei", sans-serif',
     classic: 'Georgia, "Songti SC", "SimSun", serif',
     round: '"Trebuchet MS", "Microsoft YaHei", sans-serif',
+    heiti: '"PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "SimHei", sans-serif',
+    kaiti: 'Georgia, "KaiTi", "STKaiti", "楷体", serif',
+    fangsong: 'Georgia, "FangSong", "STFangsong", "仿宋", serif',
+    mono: '"JetBrains Mono", "Cascadia Code", Consolas, "Microsoft YaHei", monospace',
   }
 
   /** 将持久化的外观配置转成画布 CSS 变量；侧栏测量依赖浏览器 DOM API。 */
@@ -36,9 +45,10 @@ export function useResumeStyle(resume: () => ResumeDocument) {
     if (isSidebarTemplate(resume().templateId) && typeof document !== 'undefined') {
       const context = document.createElement('canvas').getContext('2d')
       if (context) {
+        const tracking = letterSpacing(appearance)
         const measure = (text: string, fontSize: number) => {
           context.font = `${fontSize}px ${fontStacks[appearance.font]}`
-          return context.measureText(text).width
+          return context.measureText(text).width + Math.max(0, text.length - 1) * tracking
         }
         // 联系方式的 51px = 左右内边距 44px + 图标间距 7px，另加图标字号。
         // GitHub 的 50px = 内边距 44px + 间距 6px；个人信息仅预留 44px 内边距。
@@ -70,6 +80,7 @@ export function useResumeStyle(resume: () => ResumeDocument) {
       '--heading-size': `${resume().appearance.headingScale}px`,
       '--body-size': `${resume().appearance.bodyScale}px`,
       '--paragraph-spacing': `${paragraphSpacing(appearance)}px`,
+      '--letter-spacing': `${letterSpacing(appearance)}px`,
       '--role-size': `${size('role')}px`,
       '--github-size': `${size('github')}px`,
       '--email-size': `${size('email')}px`,

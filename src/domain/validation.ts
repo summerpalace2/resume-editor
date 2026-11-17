@@ -12,6 +12,7 @@ import { isAccentChoice } from '../data/palettes'
 import {
   baseFontOptions,
   hasValidHeaderTypography,
+  letterSpacingOption,
   paragraphSpacingOption,
 } from '../data/typography'
 
@@ -65,6 +66,8 @@ function parseFormats(value: unknown, content: string, path: string): TextFormat
       )
     if (range.bold !== undefined && range.bold !== true)
       throw new DocumentValidationError(`${path}[${index}].bold`, '应为 true 或省略')
+    if (range.italic !== undefined && range.italic !== true)
+      throw new DocumentValidationError(`${path}[${index}].italic`, '应为 true 或省略')
     if (
       range.color !== undefined &&
       (typeof range.color !== 'string' || !/^#[\da-f]{6}$/i.test(range.color))
@@ -75,6 +78,7 @@ function parseFormats(value: unknown, content: string, path: string): TextFormat
       start: range.start as number,
       end: range.end as number,
       ...(range.bold === true ? { bold: true as const } : {}),
+      ...(range.italic === true ? { italic: true as const } : {}),
       ...(typeof range.color === 'string' ? { color: range.color.toLowerCase() } : {}),
     }
   })
@@ -169,6 +173,16 @@ function parseSection(value: unknown, path: string): ResumeSection {
  * @param path 错误提示中的位置，便于定位备份中的具体文档、栏目和条目。
  * 已知旧字段缺省：github/profileLines/summary/photo；新增样式和链接保持可选。
  */
+const allowedFonts = new Set([
+  'modern',
+  'classic',
+  'round',
+  'heiti',
+  'kaiti',
+  'fangsong',
+  'mono',
+])
+
 export function parseResumeDocument(value: unknown, path = '简历'): ResumeDocument {
   const resume = record(value, path)
   if (!isResumeTemplateId(resume.templateId))
@@ -177,11 +191,7 @@ export function parseResumeDocument(value: unknown, path = '简历'): ResumeDocu
   const appearance = record(resume.appearance, `${path}.appearance`)
   if (!isAccentChoice(appearance.accent))
     throw new DocumentValidationError(`${path}.appearance.accent`, '未知配色')
-  if (
-    appearance.font !== 'modern' &&
-    appearance.font !== 'classic' &&
-    appearance.font !== 'round'
-  )
+  if (typeof appearance.font !== 'string' || !allowedFonts.has(appearance.font))
     throw new DocumentValidationError(`${path}.appearance.font`, '未知字体')
   for (const option of baseFontOptions) {
     const size = appearance[option.key]
@@ -208,6 +218,17 @@ export function parseResumeDocument(value: unknown, path = '简历'): ResumeDocu
     throw new DocumentValidationError(
       `${path}.appearance.paragraphSpacing`,
       `段落间距应在 ${paragraphSpacingOption.min}～${paragraphSpacingOption.max}px 内`,
+    )
+  if (
+    appearance.letterSpacing !== undefined &&
+    (typeof appearance.letterSpacing !== 'number' ||
+      !Number.isFinite(appearance.letterSpacing) ||
+      appearance.letterSpacing < letterSpacingOption.min ||
+      appearance.letterSpacing > letterSpacingOption.max)
+  )
+    throw new DocumentValidationError(
+      `${path}.appearance.letterSpacing`,
+      `文字间距应在 ${letterSpacingOption.min}～${letterSpacingOption.max}px 内`,
     )
   if (
     typeof resume.updatedAt !== 'number' ||
@@ -264,6 +285,9 @@ export function parseResumeDocument(value: unknown, path = '简历'): ResumeDocu
       ...(appearance.paragraphSpacing === undefined
         ? {}
         : { paragraphSpacing: appearance.paragraphSpacing as number }),
+      ...(appearance.letterSpacing === undefined
+        ? {}
+        : { letterSpacing: appearance.letterSpacing as number }),
       font: appearance.font as ResumeDocument['appearance']['font'],
       accent: appearance.accent,
       ...(appearance.headerFontSizes === undefined

@@ -13,6 +13,7 @@ import {
 } from '../services/editorViewport'
 import { toggleUnorderedList } from '../domain/textLists'
 import {
+  extractPlainPasteText,
   fromEditorPosition,
   fromRichDocument,
   toEditorPosition,
@@ -93,7 +94,13 @@ function restoreSelection(
 
 /** 使用编辑内核的原生事务改格式，选中文字立即渲染，并进入同一撤销历史。 */
 function applyFormat(
-  patch: { bold?: boolean; color?: string; clear?: boolean; resetColor?: boolean },
+  patch: {
+    bold?: boolean
+    italic?: boolean
+    color?: string
+    clear?: boolean
+    resetColor?: boolean
+  },
   focus = true,
 ): void {
   const active = editor.value
@@ -103,10 +110,12 @@ function applyFormat(
     closeHistory(tr)
     return true
   })
-  if (patch.clear) chain.unsetBold().unsetColor()
+  if (patch.clear) chain.unsetBold().unsetItalic().unsetColor()
   else {
     if (patch.bold === true) chain.setBold()
     if (patch.bold === false) chain.unsetBold()
+    if (patch.italic === true) chain.setItalic()
+    if (patch.italic === false) chain.unsetItalic()
     if (patch.color) chain.setColor(patch.color)
     if (patch.resetColor) chain.unsetColor()
   }
@@ -186,7 +195,6 @@ onMounted(async () => {
         hardBreak: false,
         heading: false,
         horizontalRule: false,
-        italic: false,
         link: false,
         listItem: false,
         listKeymap: false,
@@ -212,9 +220,11 @@ onMounted(async () => {
         ),
       }),
       handleKeyDown: (_view, event) => handleKeydown(event),
+      clipboardTextSerializer: (content) =>
+        content.content.textBetween(0, content.content.size, '\n'),
       handlePaste: (view, event) => {
         event.preventDefault()
-        const text = event.clipboardData?.getData('text/plain') ?? ''
+        const text = extractPlainPasteText(event.clipboardData)
         // 空剪贴板不替换现有选区；空格/换行仍是有效文字，不用 trim 判断。
         if (text.length === 0) {
           emit('hint', '剪贴板没有文字，请粘贴文字内容。')

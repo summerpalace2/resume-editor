@@ -2,8 +2,10 @@
 /** @file 编辑工作区页面：连接 store 与画布，管理编辑模式、保存提示和 PDF 导出。 */
 import { nextTick, ref, useTemplateRef, watch } from 'vue'
 import { useRouter } from 'vue-router'
+import PdfImportDialog from '../components/PdfImportDialog.vue'
 import ResumePreview from '../components/ResumePreview.vue'
 import PreviewZoomControls from '../components/PreviewZoomControls.vue'
+import { usePdfImport } from '../composables/usePdfImport'
 import { usePreviewZoom } from '../composables/usePreviewZoom'
 import { useResumeStore } from '../stores/resumes'
 import type { ResumeDocument } from '../types'
@@ -11,7 +13,9 @@ import type { ResumeDocument } from '../types'
 const store = useResumeStore()
 const router = useRouter()
 const stage = useTemplateRef<HTMLElement>('stage')
+const pdfInput = useTemplateRef<HTMLInputElement>('pdfInput')
 const { fitWidth, zoomPercent, minZoom, maxZoom, setZoom } = usePreviewZoom(stage)
+const { parsingPdf, pendingPdf, parsePdfFile, clearPendingPdf } = usePdfImport()
 /** 路由页面的临时交互状态，不写入简历文档。 */
 const editing = ref(false)
 /** 导出准备期间阻止重复触发，打印窗口结束后释放。 */
@@ -65,13 +69,46 @@ async function exportPdf(): Promise<void> {
   }
 }
 
-// 切换当前文档时退出编辑，避免将前一份简历的交互状态带到后一份。
+/** 切换当前文档时退出编辑，避免将前一份简历的交互状态带到后一份。 */
 watch(
   () => store.activeResumeId,
   () => {
     editing.value = false
   },
 )
+
+async function handlePdfFile(event: Event): Promise<void> {
+  const input = event.target as HTMLInputElement
+  const file = input.files?.[0]
+  if (!file) return
+  try {
+    await parsePdfFile(file)
+  } catch (error) {
+    window.alert(
+      error instanceof Error ? error.message : 'PDF 解析失败，请确认文件有效。',
+    )
+  } finally {
+    input.value = ''
+  }
+}
+
+function confirmWorkspacePdfImport(payload: {
+  resume: ResumeDocument
+  mode: 'overwrite' | 'create'
+}): void {
+  const active = store.activeResume
+  try {
+    editing.value = false
+    if (payload.mode === 'overwrite' && active) {
+      store.overwriteResume(active.id, payload.resume)
+    } else {
+      store.importResume(payload.resume)
+    }
+    clearPendingPdf()
+  } catch (error) {
+    window.alert(error instanceof Error ? error.message : '导入失败，请稍后重试。')
+  }
+}
 </script>
 
 <template>
@@ -92,6 +129,20 @@ watch(
       <nav class="toolbar-actions">
         <RouterLink class="toolbar-link" to="/resumes">我的简历</RouterLink>
         <button class="toolbar-link" @click="router.push('/settings')">样式设置</button>
+        <button
+          class="button button-quiet"
+          :disabled="parsingPdf"
+          @click="pdfInput?.click()"
+        >
+          {{ parsingPdf ? '解析 PDF 中…' : '导入 PDF' }}
+        </button>
+        <input
+          ref="pdfInput"
+          class="visually-hidden"
+          type="file"
+          accept="application/pdf,.pdf"
+          @change="handlePdfFile"
+        />
         <button class="button button-quiet" :disabled="preparingPdf" @click="exportPdf">
           {{ preparingPdf ? '准备导出…' : '导出 PDF' }}
         </button>
@@ -134,5 +185,13 @@ watch(
         />
       </div>
     </section>
+
+    <PdfImportDialog
+      :summary="pendingPdf"
+      :current-resume="store.activeResume"
+      allow-overwrite
+      @close="clearPendingPdf"
+      @confirm="confirmWorkspacePdfImport"
+    />
   </main>
 </template>

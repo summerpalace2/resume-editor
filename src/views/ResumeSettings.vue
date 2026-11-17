@@ -16,6 +16,8 @@ import {
   baseFontOptions,
   headerFontOptions,
   headerFontSize,
+  letterSpacing,
+  letterSpacingOption,
   profileLineFontSize,
   paragraphSpacing,
   paragraphSpacingOption,
@@ -45,6 +47,9 @@ const appearance = computed(() => store.activeResume?.appearance)
 const currentParagraphSpacing = computed(() =>
   appearance.value ? paragraphSpacing(appearance.value) : paragraphSpacingOption.default,
 )
+const currentLetterSpacing = computed(() =>
+  appearance.value ? letterSpacing(appearance.value) : letterSpacingOption.default,
+)
 
 /** 滑杆与数值框共用动作；空值不提交，越界输入限幅后再交给文档校验。 */
 function updateParagraphSpacing(event: Event): void {
@@ -61,6 +66,23 @@ function updateParagraphSpacing(event: Event): void {
   event.target.value = String(spacing)
   store.updateAppearance(store.activeResume.id, {
     paragraphSpacing: spacing,
+  })
+}
+
+function updateLetterSpacing(event: Event): void {
+  if (!store.activeResume || !(event.target instanceof HTMLInputElement)) return
+  const value = event.target.valueAsNumber
+  if (!Number.isFinite(value)) {
+    event.target.value = String(currentLetterSpacing.value)
+    return
+  }
+  const tracking =
+    Math.round(
+      Math.min(letterSpacingOption.max, Math.max(letterSpacingOption.min, value)) * 10,
+    ) / 10
+  event.target.value = String(tracking)
+  store.updateAppearance(store.activeResume.id, {
+    letterSpacing: tracking,
   })
 }
 /** 当前界面与画布使用同一字号解析器，旧文档缺省值保持一致。 */
@@ -111,10 +133,49 @@ function selectFont(font: FontChoice): void {
   if (store.activeResume) store.updateAppearance(store.activeResume.id, { font })
 }
 
-const fonts: { id: FontChoice; name: string; sample: string }[] = [
-  { id: 'modern', name: '清晰现代', sample: 'Aa 字体预览' },
-  { id: 'classic', name: '稳重经典', sample: 'Aa 字体预览' },
-  { id: 'round', name: '柔和圆润', sample: 'Aa 字体预览' },
+const fonts: { id: FontChoice; name: string; sample: string; stack: string }[] = [
+  {
+    id: 'modern',
+    name: '清晰现代',
+    sample: 'Aa 字体预览',
+    stack: '"Museo Sans", Arial, "Microsoft YaHei", sans-serif',
+  },
+  {
+    id: 'classic',
+    name: '稳重经典',
+    sample: 'Aa 宋体衬线',
+    stack: 'Georgia, "Songti SC", "SimSun", serif',
+  },
+  {
+    id: 'round',
+    name: '柔和圆润',
+    sample: 'Aa 圆润无衬线',
+    stack: '"Trebuchet MS", "Microsoft YaHei", sans-serif',
+  },
+  {
+    id: 'heiti',
+    name: '醒目黑体',
+    sample: 'Aa 清晰黑体',
+    stack: '"PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "SimHei", sans-serif',
+  },
+  {
+    id: 'kaiti',
+    name: '楷体书卷',
+    sample: 'Aa 楷体风格',
+    stack: 'Georgia, "KaiTi", "STKaiti", "楷体", serif',
+  },
+  {
+    id: 'fangsong',
+    name: '公文仿宋',
+    sample: 'Aa 仿宋典雅',
+    stack: 'Georgia, "FangSong", "STFangsong", "仿宋", serif',
+  },
+  {
+    id: 'mono',
+    name: '极客等宽',
+    sample: 'Aa Code 01',
+    stack: '"JetBrains Mono", "Cascadia Code", Consolas, "Microsoft YaHei", monospace',
+  },
 ]
 
 /** 筛选只影响画廊展示，不更改当前文档版式，也不写入备份。 */
@@ -171,8 +232,8 @@ function selectAccent(id: AccentChoice): void {
         <section class="setting-card">
           <div class="setting-heading">
             <div>
-              <h2>段落间距</h2>
-              <p>调整正文换行段落和列表项之间的间隔，自动折行保留原行距</p>
+              <h2>间距设置</h2>
+              <p>分别调整段落间隔与全局文字间距，预览与 PDF 导出同步生效</p>
             </div>
           </div>
           <label class="range-setting">
@@ -197,6 +258,31 @@ function selectAccent(id: AccentChoice): void {
                 step="1"
                 :value="currentParagraphSpacing"
                 @change="updateParagraphSpacing"
+              />
+            </span>
+          </label>
+          <label class="range-setting">
+            <span
+              >文字间距 <strong>{{ currentLetterSpacing }} px</strong></span
+            >
+            <span class="paragraph-spacing-controls">
+              <input
+                type="range"
+                aria-label="文字间距"
+                :min="letterSpacingOption.min"
+                :max="letterSpacingOption.max"
+                :step="letterSpacingOption.step"
+                :value="currentLetterSpacing"
+                @input="updateLetterSpacing"
+              />
+              <input
+                type="number"
+                aria-label="输入文字间距"
+                :min="letterSpacingOption.min"
+                :max="letterSpacingOption.max"
+                :step="letterSpacingOption.step"
+                :value="currentLetterSpacing"
+                @change="updateLetterSpacing"
               />
             </span>
           </label>
@@ -345,9 +431,10 @@ function selectAccent(id: AccentChoice): void {
               :key="font.id"
               class="font-option"
               :class="{ selected: appearance.font === font.id }"
+              :aria-pressed="appearance.font === font.id"
               @click="selectFont(font.id)"
             >
-              <span :class="`font-sample-${font.id}`">{{ font.sample }}</span
+              <span :style="{ fontFamily: font.stack }">{{ font.sample }}</span
               ><small>{{ font.name }}</small>
             </button>
           </div>

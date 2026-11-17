@@ -12,6 +12,7 @@ export interface TextFormatRange {
   start: number
   end: number
   bold?: true
+  italic?: true
   /** 只允许六位十六进制颜色；不存 HTML、CSS 声明或浏览器 DOM。 */
   color?: string
 }
@@ -65,7 +66,8 @@ export interface ResumeProfile {
   profileLineFormats?: TextFormatRange[][]
 }
 
-export type FontChoice = 'modern' | 'classic' | 'round'
+export type FontChoice =
+  'modern' | 'classic' | 'round' | 'heiti' | 'kaiti' | 'fangsong' | 'mono'
 /** 可持久化的主题 ID；颜色值及展示名称在 data/palettes.ts 中维护。 */
 export type AccentChoice =
   | 'ocean'
@@ -108,6 +110,11 @@ export type ResumeTemplateId =
   | 'portfolio'
   | 'compact'
   | 'creative-rail'
+  | 'bento-grid'
+  | 'swiss-grid'
+  | 'magazine-editorial'
+  | 'dev-spec'
+  | 'hero-timeline'
 export type HeaderFontTarget = 'role' | 'github' | 'email' | 'phone' | 'location'
 
 /** 外观设置中的字号都是 1024px 逻辑画布的 px 值，Scale 并非缩放倍数。 */
@@ -120,6 +127,8 @@ export interface ResumeAppearance {
   bodyScale: number
   /** 正文相邻段落的额外间距，逻辑画布 px；缺省为 6，允许 0～24。 */
   paragraphSpacing?: number
+  /** 全局文字间距（letter-spacing），逻辑画布 px；缺省为 0，允许 -1～6。 */
+  letterSpacing?: number
   /** 单项头部字号覆盖；缺项使用对应版式默认值，兼容旧文档。 */
   headerFontSizes?: Partial<Record<HeaderFontTarget, number>>
   /** 个人信息逐行字号；索引与 profile.profileLines 对齐。 */

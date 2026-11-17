@@ -125,6 +125,43 @@ export const resumeTemplates: ResumeTemplateDefinition[] = [
     layout: 'single',
     header: 'light',
   },
+  {
+    id: 'bento-grid',
+    name: 'Bento 网格卡片',
+    description: '模块化圆角卡片承载每个栏目，层次分明且现代',
+    layout: 'columns',
+    header: 'light',
+    columnStrategy: 'qualifications-left',
+  },
+  {
+    id: 'swiss-grid',
+    name: '瑞士国际排版',
+    description: '左窄栏标题锚点配右宽栏正文，极简网格与高对比留白',
+    layout: 'single',
+    header: 'light',
+  },
+  {
+    id: 'magazine-editorial',
+    name: '杂志专题编号',
+    description: '栏目自带 01/02 序号徽章，左浅底侧栏配主经历栏',
+    layout: 'columns',
+    header: 'solid',
+    columnStrategy: 'qualifications-left',
+  },
+  {
+    id: 'dev-spec',
+    name: '极客技术规格',
+    description: '等宽代码标签与虚线分隔，突出项目链接与工程经历',
+    layout: 'single',
+    header: 'light',
+  },
+  {
+    id: 'hero-timeline',
+    name: '横幅卡片时间线',
+    description: '全宽彩色页眉配合节点轨道卡片，兼顾视觉冲击与分页',
+    layout: 'single',
+    header: 'solid',
+  },
 ]
 
 /** 获取元信息；运行时未知 ID 回退到第一个模板，外部导入仍由校验入口拒绝未知值。 */

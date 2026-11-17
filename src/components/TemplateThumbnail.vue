@@ -278,4 +278,53 @@ const paletteStyle = computed(() => {
 .thumbnail-creative-rail .thumbnail-column b {
   background: var(--thumbnail-accent);
 }
+.thumbnail-bento-grid {
+  background: #f2f4f8;
+}
+.thumbnail-bento-grid .thumbnail-header {
+  margin: var(--unit) var(--unit) 0;
+  border: 1px solid var(--thumbnail-line);
+  border-top: var(--unit) solid var(--thumbnail-accent);
+  border-radius: calc(var(--unit) * 1.5);
+}
+.thumbnail-bento-grid .thumbnail-column {
+  padding: var(--unit);
+  border: 1px solid var(--thumbnail-line);
+  border-radius: calc(var(--unit) * 1.5);
+  background: #fff;
+}
+.thumbnail-swiss-grid .thumbnail-header {
+  border-top: calc(var(--unit) * 2.5) solid var(--thumbnail-accent);
+  border-bottom: 1px solid #3b4757;
+}
+.thumbnail-swiss-grid .thumbnail-column b {
+  width: 34%;
+  background: var(--thumbnail-accent);
+}
+.thumbnail-magazine-editorial .thumbnail-body {
+  grid-template-columns: 38% 1fr;
+}
+.thumbnail-magazine-editorial .thumbnail-column:first-child {
+  padding: var(--unit);
+  border-radius: var(--unit);
+  background: var(--thumbnail-soft);
+}
+.thumbnail-dev-spec .thumbnail-header {
+  background: var(--thumbnail-soft);
+  border-bottom: 1px dashed var(--thumbnail-line);
+}
+.thumbnail-dev-spec .thumbnail-column b {
+  border-left: calc(var(--unit) * 1.5) solid var(--thumbnail-accent);
+  background: var(--thumbnail-soft);
+}
+.thumbnail-hero-timeline .thumbnail-column {
+  margin-left: var(--unit);
+  padding-left: calc(var(--unit) * 2.5);
+  border-left: 1px solid var(--thumbnail-line);
+}
+.thumbnail-hero-timeline .thumbnail-column b {
+  border-radius: var(--unit);
+  background: var(--thumbnail-soft);
+  border: 1px solid var(--thumbnail-line);
+}
 </style>

@@ -148,8 +148,10 @@ export const useResumeStore = defineStore('resumes', () => {
 
   function remove(id: string): void {
     assertEditable()
-    if (!resumes.value.some((resume) => resume.id === id)) return
-    resumes.value = resumes.value.filter((resume) => resume.id !== id)
+    const index = resumes.value.findIndex((resume) => resume.id === id)
+    if (index < 0) return
+    // 原地删除，避免 filter() 返回含 Vue Proxy 元素的新数组后写入 raw 列表。
+    resumes.value.splice(index, 1)
     if (activeResumeId.value === id) activeResumeId.value = resumes.value[0]?.id ?? null
     if (!resumes.value.length) {
       const replacement = createResume('我的简历')
@@ -184,7 +186,7 @@ export const useResumeStore = defineStore('resumes', () => {
     const source = resumes.value.find((resume) => resume.id === id)
     if (!source) return
     const copy = cloneData(source)
-    Object.assign(copy.appearance, patch)
+    Object.assign(copy.appearance, cloneData(patch))
     replaceResume(copy)
   }
 
@@ -216,6 +218,39 @@ export const useResumeStore = defineStore('resumes', () => {
     return copies.length
   }
 
+  /** 导入单份外部生成的简历文档（如 PDF 解析结果），先校验并保证 ID 唯一。 */
+  function importResume(document: ResumeDocument): ResumeDocument {
+    assertEditable()
+    // parseResumeDocument 会重建纯对象，避免嵌套 Vue Proxy 传入 structuredClone。
+    const validated = cloneData(parseResumeDocument(document, '导入简历'))
+    const existingIds = new Set(resumes.value.map((resume) => resume.id))
+    while (existingIds.has(validated.id)) validated.id = crypto.randomUUID()
+    validated.updatedAt = Date.now()
+    resumes.value.push(validated)
+    activeResumeId.value = validated.id
+    queue.markDirty()
+    return validated
+  }
+
+  /** 用导入的简历内容覆盖指定文档，保留原有文档 ID 并重置更新时间。 */
+  function overwriteResume(targetId: string, document: ResumeDocument): ResumeDocument {
+    assertEditable()
+    const index = resumes.value.findIndex((resume) => resume.id === targetId)
+    if (index < 0) return importResume(document)
+    const validated = cloneData(
+      parseResumeDocument({ ...toRawDocument(document), id: targetId }, '覆盖简历'),
+    )
+    validated.updatedAt = Date.now()
+    resumes.value[index] = validated
+    activeResumeId.value = targetId
+    queue.markDirty()
+    return validated
+  }
+
+  function toRawDocument(document: ResumeDocument): ResumeDocument {
+    return parseResumeDocument(document, '简历')
+  }
+
   return {
     resumes,
     activeResumeId,
@@ -237,5 +272,7 @@ export const useResumeStore = defineStore('resumes', () => {
     updateAppearance,
     selectTemplate,
     importBackup,
+    importResume,
+    overwriteResume,
   }
 })

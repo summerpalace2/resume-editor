@@ -73,6 +73,9 @@ const selectedSegments = computed(() =>
 const allBold = computed(
   () => hasSelection.value && selectedSegments.value.every((segment) => segment.bold),
 )
+const allItalic = computed(
+  () => hasSelection.value && selectedSegments.value.every((segment) => segment.italic),
+)
 const allBulleted = computed(() =>
   hasUnorderedList(draft.value, selection.value.start, selection.value.end),
 )
@@ -109,13 +112,13 @@ function hasDisplayTextSelection(): boolean {
   const selected = window.getSelection()
   return Boolean(
     selected &&
-      !selected.isCollapsed &&
-      selected.toString().length > 0 &&
-      display.value &&
-      selected.anchorNode &&
-      selected.focusNode &&
-      display.value.contains(selected.anchorNode) &&
-      display.value.contains(selected.focusNode),
+    !selected.isCollapsed &&
+    selected.toString().length > 0 &&
+    display.value &&
+    selected.anchorNode &&
+    selected.focusNode &&
+    display.value.contains(selected.anchorNode) &&
+    display.value.contains(selected.focusNode),
   )
 }
 
@@ -235,7 +238,13 @@ function restoreSelection(): void {
 }
 
 function applyFormat(
-  patch: { bold?: boolean; color?: string; clear?: boolean; resetColor?: boolean },
+  patch: {
+    bold?: boolean
+    italic?: boolean
+    color?: string
+    clear?: boolean
+    resetColor?: boolean
+  },
   focus = true,
 ): void {
   if (!hasSelection.value) return
@@ -430,6 +439,16 @@ onUnmounted(() => {
         @click="applyFormat({ bold: !allBold })"
       >
         <b>B</b> 加粗
+      </button>
+      <button
+        type="button"
+        :disabled="!hasSelection"
+        :aria-pressed="allItalic"
+        title="斜体（Ctrl / Cmd + I）"
+        @pointerdown.prevent
+        @click="applyFormat({ italic: !allItalic })"
+      >
+        <i>I</i> 斜体
       </button>
       <button
         type="button"

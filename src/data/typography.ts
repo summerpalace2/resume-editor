@@ -19,6 +19,18 @@ export function paragraphSpacing(appearance: ResumeAppearance): number {
     : paragraphSpacingOption.default
 }
 
+/** 文字间距（letter-spacing）的唯一范围/默认值，单位为逻辑画布 px。 */
+export const letterSpacingOption = { min: -1, max: 6, step: 0.2, default: 0 } as const
+
+export function letterSpacing(appearance: ResumeAppearance): number {
+  const value = appearance.letterSpacing
+  return typeof value === 'number' && Number.isFinite(value)
+    ? Math.round(
+        Math.min(letterSpacingOption.max, Math.max(letterSpacingOption.min, value)) * 10,
+      ) / 10
+    : letterSpacingOption.default
+}
+
 /** 逻辑画布 px 范围，设置滑杆和导入校验共用；不对应 PDF 的直接 pt 值。 */
 export const headerFontOptions: {
   key: HeaderFontTarget

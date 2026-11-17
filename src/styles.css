@@ -268,8 +268,12 @@ a {
   color: #444;
   font-family: var(--resume-font);
   font-size: var(--body-size);
+  letter-spacing: var(--letter-spacing, 0px);
   line-height: 1.55;
   border-radius: 5px;
+}
+.resume-page .no-print {
+  letter-spacing: normal;
 }
 .resume-masthead {
   position: relative;
@@ -823,6 +827,14 @@ a {
   white-space: pre-wrap;
   overflow-wrap: anywhere;
 }
+.rich-text-surface[data-empty='true']:not(.rich-text-surface--multiline) {
+  /* 空单行字段在 flex 容器中保持足够占位宽度，避免「填写姓名」等占位符竖排折行。 */
+  min-width: clamp(50px, 6.2em, 220px);
+  max-width: 100%;
+}
+.resume-name .rich-text-surface[data-empty='true']:not(.rich-text-surface--multiline) {
+  min-width: clamp(50px, 4.5em, 220px);
+}
 .rich-text-surface p {
   margin: 0;
   min-height: 1em;
@@ -839,9 +851,14 @@ a {
 .rich-text-surface[data-empty='true']::before {
   content: attr(data-placeholder);
   position: absolute;
+  inset-inline: 0;
   color: #9da7b4;
   font-weight: 400;
+  text-align: inherit;
   pointer-events: none;
+}
+.rich-text-surface[data-empty='true']:not(.rich-text-surface--multiline)::before {
+  white-space: nowrap;
 }
 .masthead-contact .rich-text-surface {
   white-space: nowrap;
@@ -1744,7 +1761,8 @@ a {
     margin-bottom: 14px;
   }
   .font-options {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
   }
   .color-options {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1752,11 +1770,20 @@ a {
   }
   .font-option,
   .color-option {
-    min-height: 76px;
+    min-height: 68px;
+    padding: 10px 8px;
   }
   .template-filters button {
-    min-height: 40px;
+    min-height: 44px;
     padding-inline: 12px;
+  }
+  .paragraph-spacing-controls {
+    gap: 8px;
+  }
+  .paragraph-spacing-controls input[type='number'] {
+    width: 68px;
+    min-height: 44px;
+    font-size: 16px;
   }
   .range-setting input {
     min-height: 44px;
@@ -1937,7 +1964,8 @@ a {
   }
 }
 
-@media screen and (max-width: 720px), screen and (pointer: coarse) and (max-width: 900px) {
+@media screen and (max-width: 720px),
+  screen and (pointer: coarse) and (max-width: 900px) {
   .text-format-toolbar--floating {
     right: 12px;
     width: auto;
@@ -2016,5 +2044,260 @@ a {
   }
   .text-format-toolbar--floating .text-color-code-controls button {
     flex: 1 1 calc(50% - 8px);
+  }
+}
+
+.pdf-import-dialog {
+  width: min(1140px, calc(100vw - 32px));
+  max-width: none;
+  height: min(88dvh, 860px);
+  max-height: calc(100dvh - 32px);
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid #dfe4ea;
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: var(--shadow);
+}
+.pdf-import-dialog[open] {
+  display: flex;
+  flex-direction: column;
+}
+.pdf-import-dialog::backdrop {
+  background: rgb(24 36 53 / 55%);
+}
+.pdf-import-layout {
+  display: grid;
+  grid-template-columns: minmax(340px, 430px) minmax(0, 1fr);
+  flex: 1;
+  min-height: 0;
+}
+.pdf-import-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  overflow: auto;
+  padding: 22px 24px;
+  border-right: 1px solid #e6ebf1;
+  background: #fff;
+}
+.pdf-import-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+.pdf-import-header .eyebrow {
+  margin: 0 0 6px;
+}
+.pdf-import-header h2 {
+  margin: 0;
+  color: #26364a;
+  font-size: 20px;
+}
+.pdf-import-header .muted {
+  margin: 6px 0 0;
+  font-size: 12px;
+}
+.pdf-import-name-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  color: #3c4b60;
+  font-size: 12px;
+  font-weight: 600;
+}
+.pdf-import-name-field input {
+  padding: 9px 11px;
+  border: 1px solid #d5dde7;
+  border-radius: 8px;
+  color: #26364a;
+  font-size: 13px;
+}
+.pdf-import-toggle {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 10px 12px;
+  border: 1px solid #dce5f0;
+  border-radius: 8px;
+  background: #f5f9ff;
+  color: #314d70;
+  font-size: 12px;
+  line-height: 1.45;
+  cursor: pointer;
+}
+.pdf-import-toggle input {
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+.pdf-import-stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+.pdf-import-stats > div {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 10px 11px;
+  border: 1px solid #e6ebf1;
+  border-radius: 8px;
+  background: #f8fafc;
+}
+.pdf-import-stats strong {
+  color: #26364a;
+  font-size: 14px;
+}
+.pdf-import-stats span {
+  color: #778191;
+  font-size: 10px;
+  line-height: 1.4;
+}
+.pdf-import-links {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px 14px;
+  border: 1px solid #e6ebf1;
+  border-radius: 8px;
+  background: #fbfcfe;
+}
+.pdf-import-links strong {
+  color: #3c4b60;
+  font-size: 12px;
+}
+.pdf-import-links ul {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-height: 120px;
+  overflow: auto;
+  margin: 0;
+  padding-left: 16px;
+}
+.pdf-import-links a {
+  color: #2563eb;
+  font-size: 12px;
+  word-break: break-all;
+}
+.pdf-import-warnings {
+  margin: 0;
+  padding: 10px 14px 10px 28px;
+  border: 1px solid #f2d59f;
+  border-radius: 8px;
+  background: #fffbeb;
+  color: #8a5a12;
+  font-size: 12px;
+}
+.pdf-import-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: auto;
+  padding-top: 8px;
+}
+.pdf-import-preview-pane {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  padding: 16px 20px;
+  background: #f3f5f8;
+}
+.pdf-import-preview-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+.pdf-import-preview-head strong {
+  color: #26364a;
+  font-size: 13px;
+}
+.pdf-import-preview-head span {
+  color: #778191;
+  font-size: 11px;
+}
+.pdf-import-preview-pane .resume-preview-viewer {
+  flex: 1;
+  min-height: 0;
+}
+@media screen and (max-width: 920px) {
+  .pdf-import-dialog {
+    width: calc(100vw - 20px);
+    height: calc(100dvh - 20px);
+    max-height: calc(100dvh - 20px);
+    overflow: auto;
+  }
+  .pdf-import-layout {
+    grid-template-columns: 1fr;
+  }
+  .pdf-import-sidebar {
+    overflow: visible;
+    padding: 18px;
+    border-right: 0;
+    border-bottom: 1px solid #e6ebf1;
+  }
+  .pdf-import-header button,
+  .pdf-import-name-field input,
+  .pdf-import-toggle,
+  .pdf-import-actions .button {
+    min-height: 44px;
+  }
+  .pdf-import-name-field input {
+    font-size: 16px;
+  }
+  .pdf-import-toggle {
+    align-items: center;
+  }
+  .pdf-import-toggle input {
+    width: 18px;
+    height: 18px;
+    margin-top: 0;
+  }
+  .pdf-import-preview-pane {
+    min-height: clamp(340px, 54dvh, 500px);
+    padding: 14px 16px;
+  }
+  .pdf-import-preview-pane .settings-resume-preview {
+    height: clamp(270px, 46dvh, 430px);
+  }
+}
+@media screen and (max-width: 640px) {
+  .pdf-import-dialog {
+    width: calc(100vw - 12px);
+    height: calc(100dvh - 12px);
+    max-height: calc(100dvh - 12px);
+    border-radius: 10px;
+  }
+  .pdf-import-sidebar {
+    padding: 14px;
+    gap: 11px;
+  }
+  .pdf-import-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+  .pdf-import-stats > div:last-child {
+    grid-column: 1 / -1;
+  }
+  .pdf-import-actions .button {
+    flex: 1 1 calc(50% - 4px);
+    justify-content: center;
+  }
+  .pdf-import-actions .button-primary {
+    flex-basis: 100%;
+    order: -1;
+  }
+  .pdf-import-preview-pane {
+    min-height: clamp(320px, 50dvh, 440px);
+    padding: 12px;
+  }
+  .pdf-import-preview-head {
+    flex-direction: column;
+    gap: 2px;
   }
 }

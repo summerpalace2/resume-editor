@@ -24,7 +24,11 @@ const paragraphParts = computed(() => textParagraphs(props.text, props.formats))
       <span
         v-for="segment in paragraph.segments"
         :key="segment.start"
-        :style="{ fontWeight: segment.bold ? 700 : undefined, color: segment.color }"
+        :style="{
+          fontWeight: segment.bold ? 700 : undefined,
+          fontStyle: segment.italic ? 'italic' : undefined,
+          color: segment.color,
+        }"
         >{{ segment.text }}</span
       ><span v-if="paragraph.breakText" class="paragraph-break" aria-hidden="true">{{
         paragraph.breakText
@@ -35,7 +39,11 @@ const paragraphParts = computed(() => textParagraphs(props.text, props.formats))
     <span
       v-for="segment in segments"
       :key="segment.start"
-      :style="{ fontWeight: segment.bold ? 700 : undefined, color: segment.color }"
+      :style="{
+        fontWeight: segment.bold ? 700 : undefined,
+        fontStyle: segment.italic ? 'italic' : undefined,
+        color: segment.color,
+      }"
       >{{ segment.text }}</span
     >
   </template>

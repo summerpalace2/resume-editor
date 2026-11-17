@@ -6,6 +6,7 @@ export interface TextSegment {
   start: number
   end: number
   bold?: true
+  italic?: true
   color?: string
 }
 
@@ -17,10 +18,10 @@ export interface TextParagraph {
 }
 
 function sameStyle(
-  a: Pick<TextFormatRange, 'bold' | 'color'>,
-  b: Pick<TextFormatRange, 'bold' | 'color'>,
+  a: Pick<TextFormatRange, 'bold' | 'italic' | 'color'>,
+  b: Pick<TextFormatRange, 'bold' | 'italic' | 'color'>,
 ): boolean {
-  return a.bold === b.bold && a.color === b.color
+  return a.bold === b.bold && a.italic === b.italic && a.color === b.color
 }
 
 /** 避免在 emoji 等代理对中间切段，保持显示字符完整。 */
@@ -35,7 +36,8 @@ export function splitsSurrogate(text: string, position: number): boolean {
 export function normalizeFormats(ranges: TextFormatRange[]): TextFormatRange[] {
   const result: TextFormatRange[] = []
   for (const range of ranges) {
-    if (range.start >= range.end || (!range.bold && !range.color)) continue
+    if (range.start >= range.end || (!range.bold && !range.italic && !range.color))
+      continue
     const previous = result.at(-1)
     if (previous && previous.end === range.start && sameStyle(previous, range))
       previous.end = range.end
@@ -143,7 +145,7 @@ export function formatSelection(
   ranges: TextFormatRange[],
   start: number,
   end: number,
-  patch: { bold?: boolean; color?: string; clear?: boolean },
+  patch: { bold?: boolean; italic?: boolean; color?: string; clear?: boolean },
 ): TextFormatRange[] {
   if (start < 0 || start >= end || end > text.length) return ranges
   if (splitsSurrogate(text, start)) start--
@@ -166,16 +168,22 @@ export function formatSelection(
       start: left,
       end: right,
       ...(existing?.bold ? { bold: true } : {}),
+      ...(existing?.italic ? { italic: true } : {}),
       ...(existing?.color ? { color: existing.color } : {}),
     }
     if (left >= start && right <= end) {
       if (patch.clear) {
         delete range.bold
+        delete range.italic
         delete range.color
       } else {
         if (patch.bold !== undefined) {
           if (patch.bold) range.bold = true
           else delete range.bold
+        }
+        if (patch.italic !== undefined) {
+          if (patch.italic) range.italic = true
+          else delete range.italic
         }
         if (patch.color !== undefined) range.color = patch.color.toLowerCase()
       }

@@ -2,14 +2,19 @@
 /** @file 多份简历管理页面：选择、新建、复制、删除以及整份工作区备份。 */
 import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
+import PdfImportDialog from '../components/PdfImportDialog.vue'
+import { usePdfImport } from '../composables/usePdfImport'
 import { createBackup, downloadJson } from '../storage/backup'
 import { useResumeStore } from '../stores/resumes'
 import TemplateThumbnail from '../components/TemplateThumbnail.vue'
 import { getResumeTemplate } from '../data/templates'
+import type { ResumeDocument } from '../types'
 
 const store = useResumeStore()
 const router = useRouter()
 const importInput = ref<HTMLInputElement | null>(null)
+const pdfInput = ref<HTMLInputElement | null>(null)
+const { parsingPdf, pendingPdf, parsePdfFile, clearPendingPdf } = usePdfImport()
 /** 先复制再按修改时间降序排列，不把展示排序反写到 store 的源数组。 */
 const resumesSorted = computed(() =>
   [...store.resumes].sort((a, b) => b.updatedAt - a.updatedAt),
@@ -69,6 +74,31 @@ async function importBackup(event: Event): Promise<void> {
     input.value = ''
   }
 }
+
+async function handlePdfFile(event: Event): Promise<void> {
+  const input = event.target as HTMLInputElement
+  const file = input.files?.[0]
+  if (!file) return
+  try {
+    await parsePdfFile(file)
+  } catch (error) {
+    window.alert(
+      error instanceof Error ? error.message : 'PDF 解析失败，请确认文件有效。',
+    )
+  } finally {
+    input.value = ''
+  }
+}
+
+function confirmPdfImport(payload: { resume: ResumeDocument }): void {
+  try {
+    store.importResume(payload.resume)
+    clearPendingPdf()
+    void router.push('/')
+  } catch (error) {
+    window.alert(error instanceof Error ? error.message : '导入失败，请稍后重试。')
+  }
+}
 </script>
 
 <template>
@@ -97,6 +127,20 @@ async function importBackup(event: Event): Promise<void> {
           <strong>浏览器本地数据</strong><span>自动保存到当前浏览器，不会上传服务器</span>
         </div>
         <div class="backup-actions">
+          <button
+            class="button button-quiet"
+            :disabled="parsingPdf"
+            @click="pdfInput?.click()"
+          >
+            {{ parsingPdf ? '解析 PDF 中…' : '导入 PDF' }}
+          </button>
+          <input
+            ref="pdfInput"
+            class="visually-hidden"
+            type="file"
+            accept="application/pdf,.pdf"
+            @change="handlePdfFile"
+          />
           <button class="button button-quiet" @click="exportBackup">备份全部简历</button>
           <button class="button button-quiet" @click="importInput?.click()">
             导入备份
@@ -156,5 +200,11 @@ async function importBackup(event: Event): Promise<void> {
         简历保存在当前浏览器的本地数据库，不在项目文件夹内。换浏览器、电脑或访问地址时，请先下载备份，再在新环境导入。
       </p>
     </section>
+
+    <PdfImportDialog
+      :summary="pendingPdf"
+      @close="clearPendingPdf"
+      @confirm="confirmPdfImport"
+    />
   </main>
 </template>
