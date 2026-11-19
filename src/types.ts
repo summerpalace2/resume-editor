@@ -116,6 +116,8 @@ export type ResumeTemplateId =
   | 'dev-spec'
   | 'hero-timeline'
 export type HeaderFontTarget = 'role' | 'github' | 'email' | 'phone' | 'location'
+export type GithubStickerId =
+  'github' | 'github-badge' | 'code' | 'terminal' | 'spark' | 'rocket' | 'globe' | 'dot'
 
 /** 外观设置中的字号都是 1024px 逻辑画布的 px 值，Scale 并非缩放倍数。 */
 export interface ResumeAppearance {
@@ -123,12 +125,16 @@ export interface ResumeAppearance {
   nameScale: number
   /** 栏目标题字号；设置界面提供 20～32px。 */
   headingScale: number
-  /** 正文、条目标题和时间字号；设置界面提供 14～24px。 */
+  /** 条目标题字号，逻辑画布 px；缺省时跟随 bodyScale，允许 14～32。 */
+  entryTitleScale?: number
+  /** 正文、副标题和时间字号；设置界面提供 14～24px。 */
   bodyScale: number
   /** 正文相邻段落的额外间距，逻辑画布 px；缺省为 6，允许 0～24。 */
   paragraphSpacing?: number
   /** 全局文字间距（letter-spacing），逻辑画布 px；缺省为 0，允许 -1～6。 */
   letterSpacing?: number
+  /** GitHub 链接旁的贴纸图标样式；缺省为 'github'。 */
+  githubSticker?: GithubStickerId
   /** 单项头部字号覆盖；缺项使用对应版式默认值，兼容旧文档。 */
   headerFontSizes?: Partial<Record<HeaderFontTarget, number>>
   /** 个人信息逐行字号；索引与 profile.profileLines 对齐。 */

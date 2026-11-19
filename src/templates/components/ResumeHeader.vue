@@ -1,7 +1,10 @@
 <script setup lang="ts">
 /** @file 个人信息页眉的展示与就地编辑；沿用共享 CSS 的原有 DOM 结构。 */
+import ExternalArrowIcon from '../../components/ExternalArrowIcon.vue'
+import GithubIcon from '../../components/GithubIcon.vue'
 import InlineEdit from '../../components/InlineEdit.vue'
 import { useResumeEditing } from '../../composables/useResumeEditing'
+import { resolveGithubSticker } from '../../data/stickers'
 import { profileLineFontSize } from '../../data/typography'
 import { githubUrl, githubLabel, githubEditValue } from '../../domain/links'
 import type { ResumeDocument } from '../../types'
@@ -13,6 +16,7 @@ const {
   updateGitHubFromInput,
   selectPhoto,
   removePhoto,
+  cycleGithubSticker,
 } = useResumeEditing(
   () => props.resume,
   (resume) => emit('update:resume', resume),
@@ -37,12 +41,25 @@ const {
           :href="githubUrl(resume.profile.github)"
           target="_blank"
           rel="noopener noreferrer"
+          :aria-label="`打开 GitHub：${githubLabel(resume.profile.github)}`"
         >
-          <span aria-hidden="true">◉</span>
-          {{ githubLabel(resume.profile.github) }}
+          <GithubIcon :variant="resolveGithubSticker(resume.appearance)" />
+          <span>{{ githubLabel(resume.profile.github) }}</span>
+          <span class="entry-title-link github-jump-badge">
+            <ExternalArrowIcon />
+            <span>跳转</span>
+          </span>
         </a>
         <label v-else-if="editing" class="github-handle github-handle--editing">
-          <span aria-hidden="true">◉</span>
+          <button
+            type="button"
+            class="github-sticker-btn no-print"
+            title="点击切换贴纸样式"
+            aria-label="切换 GitHub 贴纸样式"
+            @click.prevent="cycleGithubSticker"
+          >
+            <GithubIcon :variant="resolveGithubSticker(resume.appearance)" />
+          </button>
           <input
             class="link-address-input"
             type="url"

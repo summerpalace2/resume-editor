@@ -1,6 +1,7 @@
 /** @file 将文档外观编排为响应式 CSS 变量；字体就绪后重新测量侧栏。 */
 import { computed, ref, onMounted, onUnmounted } from 'vue'
 import {
+  entryTitleFontSize,
   headerFontSize,
   letterSpacing,
   paragraphSpacing,
@@ -8,7 +9,7 @@ import {
 } from '../data/typography'
 import { getResumePalette } from '../data/palettes'
 import { isSidebarTemplate } from '../data/templates'
-import { githubLabel } from '../domain/links'
+import { githubLabel, githubUrl } from '../domain/links'
 import type { ResumeDocument } from '../types'
 
 export function useResumeStyle(resume: () => ResumeDocument) {
@@ -59,9 +60,11 @@ export function useResumeStyle(resume: () => ResumeDocument) {
             measure(resume().profile.email, size('email')) + size('email') + 51,
             measure(resume().profile.phone, size('phone')) + size('phone') + 51,
             measure(resume().profile.location, size('location')) + size('location') + 51,
+            // 50px = 内边距 44px + 间距 6px；有链接时另为「跳转」胶囊预留 56px。
             measure(githubLabel(resume().profile.github), size('github')) +
               size('github') * 1.4 +
-              50,
+              50 +
+              (githubUrl(resume().profile.github) ? 56 : 0),
             ...(resume().profile.profileLines ?? []).map(
               (line, index) => measure(line, profileLineFontSize(appearance, index)) + 44,
             ),
@@ -78,6 +81,7 @@ export function useResumeStyle(resume: () => ResumeDocument) {
       '--resume-font': fontStacks[resume().appearance.font],
       '--name-size': `${resume().appearance.nameScale}px`,
       '--heading-size': `${resume().appearance.headingScale}px`,
+      '--entry-title-size': `${entryTitleFontSize(appearance)}px`,
       '--body-size': `${resume().appearance.bodyScale}px`,
       '--paragraph-spacing': `${paragraphSpacing(appearance)}px`,
       '--letter-spacing': `${letterSpacing(appearance)}px`,

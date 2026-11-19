@@ -159,6 +159,9 @@
   .resume-page.layout-hero-timeline .resume-entry + .resume-entry {
     margin-top: 10px;
   }
+  .resume-page.layout-timeline .resume-entry + .resume-entry {
+    margin-top: calc(var(--paragraph-spacing, 6px) + 2px);
+  }
   .inline-editable {
     outline: 0 !important;
   }

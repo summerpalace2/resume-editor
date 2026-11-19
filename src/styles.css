@@ -315,6 +315,7 @@ a {
 }
 .github-handle {
   display: inline-flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 6px;
   min-height: 40px;
@@ -324,8 +325,35 @@ a {
   color: var(--header-ink);
   font-size: var(--github-size);
 }
-.github-handle > span {
-  font-size: 1.4em;
+.github-icon {
+  flex: 0 0 auto;
+  width: 1.25em;
+  height: 1.25em;
+}
+.github-jump-badge {
+  border-color: rgb(255 255 255 / 32%);
+  background: rgb(255 255 255 / 16%);
+  color: inherit;
+}
+.github-handle:hover .github-jump-badge {
+  border-color: rgb(255 255 255 / 60%);
+  background: rgb(255 255 255 / 28%);
+  color: inherit;
+}
+.github-sticker-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  border: 1px dashed rgb(255 255 255 / 45%);
+  border-radius: 6px;
+  background: rgb(255 255 255 / 12%);
+  color: inherit;
+  font-size: inherit;
+  cursor: pointer;
+}
+.github-sticker-btn:hover {
+  background: rgb(255 255 255 / 24%);
 }
 .github-handle--editing {
   max-width: min(420px, 42vw);
@@ -569,6 +597,10 @@ a {
   position: relative;
   break-inside: avoid;
 }
+.resume-entry + .resume-entry {
+  /* 条目之间始终略大于段内换行间距，避免相邻项目比段内更挤。 */
+  margin-top: calc(var(--paragraph-spacing, 6px) + 6px);
+}
 .entry-topline {
   display: flex;
   flex-wrap: wrap;
@@ -579,8 +611,9 @@ a {
 }
 .entry-title {
   color: #4a4a4a;
-  font-size: var(--body-size);
+  font-size: var(--entry-title-size, var(--body-size));
   font-weight: 700;
+  line-height: 1.45;
   min-width: 0;
   overflow-wrap: anywhere;
 }
@@ -1197,6 +1230,22 @@ a {
   color: #405a79;
   font-size: 10px;
 }
+.range-setting-meta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.range-reset-link {
+  border: 0;
+  padding: 0;
+  background: transparent;
+  color: #4d7098;
+  font-size: 10px;
+  cursor: pointer;
+}
+.range-reset-link:hover {
+  text-decoration: underline;
+}
 .range-setting input {
   width: 100%;
   margin-top: 9px;
@@ -1237,8 +1286,14 @@ a {
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 10px;
 }
+.sticker-options {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
 .font-option,
-.color-option {
+.color-option,
+.sticker-option {
   position: relative;
   display: flex;
   flex-direction: column;
@@ -1251,8 +1306,34 @@ a {
   background: #fff;
   cursor: pointer;
 }
+.sticker-option {
+  gap: 5px;
+  min-height: 88px;
+  padding: 10px 8px;
+}
+.sticker-option-preview {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: #f0f4f9;
+  color: #314d70;
+  font-size: 16px;
+}
+.sticker-option strong {
+  color: #3c4c61;
+  font-size: 12px;
+  font-weight: 600;
+}
+.sticker-option small {
+  color: #788595;
+  font-size: 9px;
+}
 .font-option.selected,
 .color-option.selected,
+.sticker-option.selected,
 .template-option.selected {
   border-color: #718da9;
   box-shadow: inset 0 0 0 1px #718da9;
@@ -1683,6 +1764,11 @@ a {
     --mobile-role-size: clamp(14px, calc(var(--role-size) * 0.72), 20px);
     --mobile-github-size: clamp(13px, calc(var(--github-size) * 0.78), 16px);
     --mobile-heading-size: clamp(16px, calc(var(--heading-size) * 0.78), 22px);
+    --mobile-entry-title-size: clamp(
+      14px,
+      calc(var(--entry-title-size, var(--body-size)) * 0.78),
+      22px
+    );
     --mobile-body-size: clamp(14px, calc(var(--body-size) * 0.76), 17px);
     width: 100%;
     min-height: 0;
@@ -1782,7 +1868,9 @@ a {
   .resume-mobile-frame .section-title {
     font-size: var(--mobile-heading-size);
   }
-  .resume-mobile-frame .entry-title,
+  .resume-mobile-frame .entry-title {
+    font-size: var(--mobile-entry-title-size);
+  }
   .resume-mobile-frame .entry-subtitle,
   .resume-mobile-frame .entry-period,
   .resume-mobile-frame .entry-description {
@@ -1944,12 +2032,14 @@ a {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 8px;
   }
-  .color-options {
+  .color-options,
+  .sticker-options {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 8px;
   }
   .font-option,
-  .color-option {
+  .color-option,
+  .sticker-option {
     min-height: 68px;
     padding: 10px 8px;
   }

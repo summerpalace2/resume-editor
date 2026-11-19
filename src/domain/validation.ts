@@ -9,8 +9,10 @@ import type {
 import { normalizeFormats, splitsSurrogate } from './textFormatting'
 import { isResumeTemplateId } from '../data/templates'
 import { isAccentChoice } from '../data/palettes'
+import { isGithubStickerId } from '../data/stickers'
 import {
   baseFontOptions,
+  entryTitleFontOption,
   hasValidHeaderTypography,
   letterSpacingOption,
   paragraphSpacingOption,
@@ -206,6 +208,17 @@ export function parseResumeDocument(value: unknown, path = '简历'): ResumeDocu
         `字号应在 ${option.min}～${option.max}px 内`,
       )
   }
+  if (
+    appearance.entryTitleScale !== undefined &&
+    (typeof appearance.entryTitleScale !== 'number' ||
+      !Number.isFinite(appearance.entryTitleScale) ||
+      appearance.entryTitleScale < entryTitleFontOption.min ||
+      appearance.entryTitleScale > entryTitleFontOption.max)
+  )
+    throw new DocumentValidationError(
+      `${path}.appearance.entryTitleScale`,
+      `条目标题字号应在 ${entryTitleFontOption.min}～${entryTitleFontOption.max}px 内`,
+    )
   if (!hasValidHeaderTypography(appearance))
     throw new DocumentValidationError(`${path}.appearance`, '头部或个人信息字号无效')
   if (
@@ -230,6 +243,11 @@ export function parseResumeDocument(value: unknown, path = '简历'): ResumeDocu
       `${path}.appearance.letterSpacing`,
       `文字间距应在 ${letterSpacingOption.min}～${letterSpacingOption.max}px 内`,
     )
+  if (
+    appearance.githubSticker !== undefined &&
+    !isGithubStickerId(appearance.githubSticker)
+  )
+    throw new DocumentValidationError(`${path}.appearance.githubSticker`, '未知贴纸样式')
   if (
     typeof resume.updatedAt !== 'number' ||
     !Number.isSafeInteger(resume.updatedAt) ||
@@ -281,6 +299,9 @@ export function parseResumeDocument(value: unknown, path = '简历'): ResumeDocu
     appearance: {
       nameScale: appearance.nameScale as number,
       headingScale: appearance.headingScale as number,
+      ...(appearance.entryTitleScale === undefined
+        ? {}
+        : { entryTitleScale: appearance.entryTitleScale as number }),
       bodyScale: appearance.bodyScale as number,
       ...(appearance.paragraphSpacing === undefined
         ? {}
@@ -288,6 +309,9 @@ export function parseResumeDocument(value: unknown, path = '简历'): ResumeDocu
       ...(appearance.letterSpacing === undefined
         ? {}
         : { letterSpacing: appearance.letterSpacing as number }),
+      ...(appearance.githubSticker === undefined
+        ? {}
+        : { githubSticker: appearance.githubSticker }),
       font: appearance.font as ResumeDocument['appearance']['font'],
       accent: appearance.accent,
       ...(appearance.headerFontSizes === undefined

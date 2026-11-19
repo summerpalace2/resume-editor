@@ -1,6 +1,7 @@
 <script setup lang="ts">
 /** @file 单条经历的展示、链接、字段编辑和排序按钮；不访问工作区存储。 */
 import { nextTick, ref, watch } from 'vue'
+import ExternalArrowIcon from '../../components/ExternalArrowIcon.vue'
 import InlineEdit from '../../components/InlineEdit.vue'
 import FormattedText from '../../components/FormattedText.vue'
 import { useResumeEditing } from '../../composables/useResumeEditing'
@@ -85,10 +86,7 @@ watch(
           :aria-label="`打开${entry.title}链接`"
           title="打开链接"
         >
-          <svg viewBox="0 0 20 20" aria-hidden="true">
-            <path d="M11 3h6v6M17 3 9 11" />
-            <path d="M15 11v5a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h5" />
-          </svg>
+          <ExternalArrowIcon />
           <span>跳转</span>
         </a>
         <button

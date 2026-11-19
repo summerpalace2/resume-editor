@@ -3,9 +3,11 @@
 import { computed, ref, useTemplateRef } from 'vue'
 import { useRouter } from 'vue-router'
 import { useResumeStore } from '../stores/resumes'
+import GithubIcon from '../components/GithubIcon.vue'
 import ResumePreviewViewport from '../components/ResumePreviewViewport.vue'
 import TemplateThumbnail from '../components/TemplateThumbnail.vue'
 import { paletteGroups, resumePalettes } from '../data/palettes'
+import { githubStickerOptions, resolveGithubSticker } from '../data/stickers'
 import {
   getResumeTemplate,
   layoutLabels,
@@ -14,6 +16,8 @@ import {
 } from '../data/templates'
 import {
   baseFontOptions,
+  entryTitleFontOption,
+  entryTitleFontSize,
   headerFontOptions,
   headerFontSize,
   letterSpacing,
@@ -25,6 +29,7 @@ import {
 import type {
   AccentChoice,
   FontChoice,
+  GithubStickerId,
   HeaderFontTarget,
   ResumeTemplateId,
 } from '../types'
@@ -49,6 +54,9 @@ const currentParagraphSpacing = computed(() =>
 )
 const currentLetterSpacing = computed(() =>
   appearance.value ? letterSpacing(appearance.value) : letterSpacingOption.default,
+)
+const currentEntryTitleSize = computed(() =>
+  appearance.value ? entryTitleFontSize(appearance.value) : 20,
 )
 
 /** 滑杆与数值框共用动作；空值不提交，越界输入限幅后再交给文档校验。 */
@@ -127,6 +135,18 @@ function updateBaseSize(
 ): void {
   if (store.activeResume && event.target instanceof HTMLInputElement)
     store.updateAppearance(store.activeResume.id, { [key]: Number(event.target.value) })
+}
+
+function updateEntryTitleSize(event: Event): void {
+  if (store.activeResume && event.target instanceof HTMLInputElement)
+    store.updateAppearance(store.activeResume.id, {
+      entryTitleScale: Number(event.target.value),
+    })
+}
+
+function resetEntryTitleSize(): void {
+  if (store.activeResume)
+    store.updateAppearance(store.activeResume.id, { entryTitleScale: undefined })
 }
 
 function selectFont(font: FontChoice): void {
@@ -209,6 +229,13 @@ const groupedPalettes = paletteGroups.map((group) => ({
 function selectAccent(id: AccentChoice): void {
   if (!store.activeResume) return
   store.updateAppearance(store.activeResume.id, { accent: id })
+}
+
+const currentGithubSticker = computed(() => resolveGithubSticker(appearance.value))
+
+function selectGithubSticker(id: GithubStickerId): void {
+  if (!store.activeResume) return
+  store.updateAppearance(store.activeResume.id, { githubSticker: id })
 }
 </script>
 
@@ -406,6 +433,28 @@ function selectAccent(id: AccentChoice): void {
           /></label>
           <label class="range-setting"
             ><span
+              >条目标题
+              <span class="range-setting-meta"
+                ><button
+                  v-if="appearance.entryTitleScale !== undefined"
+                  type="button"
+                  class="range-reset-link"
+                  @click.prevent="resetEntryTitleSize"
+                >
+                  跟随正文</button
+                ><strong>{{ currentEntryTitleSize }} px</strong></span
+              ></span
+            ><input
+              :value="currentEntryTitleSize"
+              aria-label="条目标题字号"
+              type="range"
+              :min="entryTitleFontOption.min"
+              :max="entryTitleFontOption.max"
+              :step="entryTitleFontOption.step"
+              @input="updateEntryTitleSize"
+          /></label>
+          <label class="range-setting"
+            ><span
               >正文 <strong>{{ appearance.bodyScale }} px</strong></span
             ><input
               :value="appearance.bodyScale"
@@ -436,6 +485,32 @@ function selectAccent(id: AccentChoice): void {
             >
               <span :style="{ fontFamily: font.stack }">{{ font.sample }}</span
               ><small>{{ font.name }}</small>
+            </button>
+          </div>
+        </section>
+
+        <section class="setting-card">
+          <div class="setting-heading">
+            <div>
+              <h2>GitHub 贴纸样式</h2>
+              <p>选择主页链接旁展示的矢量贴纸图标，编辑态点击图标也可快速切换</p>
+            </div>
+            <span class="template-count">{{ githubStickerOptions.length }} 款贴纸</span>
+          </div>
+          <div class="sticker-options" role="group" aria-label="GitHub 贴纸样式">
+            <button
+              v-for="sticker in githubStickerOptions"
+              :key="sticker.id"
+              class="sticker-option"
+              :class="{ selected: currentGithubSticker === sticker.id }"
+              :aria-pressed="currentGithubSticker === sticker.id"
+              @click="selectGithubSticker(sticker.id)"
+            >
+              <span class="sticker-option-preview">
+                <GithubIcon :variant="sticker.id" />
+              </span>
+              <strong>{{ sticker.name }}</strong>
+              <small>{{ sticker.description }}</small>
             </button>
           </div>
         </section>

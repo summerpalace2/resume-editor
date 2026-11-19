@@ -13,6 +13,20 @@
   color: var(--accent);
   opacity: 1;
 }
+.resume-page.light-header .github-jump-badge {
+  border-color: color-mix(in srgb, var(--accent) 28%, white);
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+.resume-page.light-header .github-handle:hover .github-jump-badge {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: #fff;
+}
+.resume-page.light-header .github-sticker-btn {
+  border-color: var(--accent-line);
+  background: var(--accent-soft);
+}
 .resume-page.light-header .link-address-input {
   border-color: var(--accent-line);
   background: var(--accent-soft);
@@ -369,6 +383,9 @@
   padding-top: 0.25em;
   line-height: 1.42;
 }
+.resume-page.layout-compact .resume-entry + .resume-entry {
+  margin-top: calc(var(--paragraph-spacing, 6px) * 0.75 + 3px);
+}
 
 /* 创意侧线以短色块做栏目锚点，避免长色带挤占正文宽度。 */
 .resume-page.layout-creative-rail .resume-masthead {
@@ -640,6 +657,10 @@
   border: 1px solid var(--accent-line);
   border-radius: 10px;
   background: color-mix(in srgb, var(--accent-soft) 45%, #fff);
+}
+.resume-page.layout-hero-timeline .resume-entry + .resume-entry {
+  /* 时间线卡片改由 .entry-list gap 控制间距，避免与全局条目 margin 叠加。 */
+  margin-top: 0;
 }
 .resume-page.layout-hero-timeline .resume-entry::before {
   content: '';

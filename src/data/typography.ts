@@ -9,6 +9,16 @@ export const baseFontOptions = [
   { key: 'bodyScale', label: '正文', min: 14, max: 24 },
 ] as const
 
+/** 条目标题字号范围；缺省时自动沿用正文（bodyScale），保持旧文档视觉一致。 */
+export const entryTitleFontOption = { min: 14, max: 32, step: 0.5 } as const
+
+export function entryTitleFontSize(appearance: ResumeAppearance): number {
+  const value = appearance.entryTitleScale
+  return typeof value === 'number' && Number.isFinite(value)
+    ? Math.min(entryTitleFontOption.max, Math.max(entryTitleFontOption.min, value))
+    : appearance.bodyScale
+}
+
 /** 正文段落间距的唯一范围/默认值；不影响自动折行的行距。 */
 export const paragraphSpacingOption = { min: 0, max: 24, default: 6 } as const
 

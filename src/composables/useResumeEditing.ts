@@ -1,6 +1,7 @@
 /** @file 文档草稿与组件事件的编排；业务变换交给纯操作模块，存储交给父页面。 */
 import { computed, onUnmounted } from 'vue'
 import { cloneData } from '../data/clone'
+import { nextGithubSticker, resolveGithubSticker } from '../data/stickers'
 import * as operations from '../domain/operations'
 import { compressPhoto } from '../services/photos'
 import { isColumnTemplate, resolveSectionColumn } from '../data/templates'
@@ -166,6 +167,15 @@ export function useResumeEditing(
     })
   }
 
+  function cycleGithubSticker(): void {
+    apply((draft) => {
+      draft.appearance.githubSticker = nextGithubSticker(
+        resolveGithubSticker(draft.appearance),
+      )
+      return true
+    })
+  }
+
   return {
     usesColumns,
     sectionColumn,
@@ -190,5 +200,6 @@ export function useResumeEditing(
     dropEntry,
     selectPhoto,
     removePhoto,
+    cycleGithubSticker,
   }
 }
